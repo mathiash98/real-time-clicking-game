@@ -1,0 +1,28 @@
+#header {
+    background-color: gray;
+    width: 800px;
+}
+#container {
+    overflow: hidden;
+}
+
+#navigation {
+    background-color: #454545;
+    width: 180px;
+    float: left;
+    margin-bottom: -32767px;
+    padding-bottom: 322767px;
+}
+
+#content {
+    background-color: #c4c4c4;
+    width: 620px;
+    float: left;
+    margin-bottom: -32767px;
+    padding-bottom: 32767px;
+}
+
+#footer {
+    background-color: gray;
+    width: 800px;
+}
