@@ -2,3 +2,5 @@
 
 # real-time-clicking-game
 Some game probably about mafias killing each others and earning cash
+
+Online game created by some students in Bergen who wishes to become jedi-coders
