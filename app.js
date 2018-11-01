@@ -1,41 +1,48 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// Dependencies
+const express = require('express');
+const path = require('path');
+const exphbs = require('express-handlebars');
+const app = express();
+const session = require('express-session');
+const mongoose = require('mongoose');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const config = require('./config');
 
-var app = express();
+// Connect to mongodb
+mongoose.connect(config.mongodb.uri, { useNewUrlParser: true }, function (err) {
+    if(err) {throw err;}
+    console.log('Connected to mongodb');
+});
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'hbs');
+// const server = https.createServer({}, app);
+app.listen(config.ports[0]);
+console.log('Listening on ' + config.ports[0]);
 
-app.use(logger('dev'));
+//Define template eninge
+var hbs = exphbs.create({
+    defaultLayout: 'main',
+    partialsDir: [
+      __dirname+'/views/partials/'
+    ],
+    layoutsDir: __dirname+'/views/layouts/',
+    extname: "hbs",
+    helpers: {
+      json: function (content) {
+        return JSON.stringify(content);
+      }
+    }
+});
+
+// required for passport session
+app.use(session({
+    secret: config.secret,
+    saveUninitialized: true,
+    resave: true
+}));
+app.engine('hbs', hbs.engine);
 app.use(express.json());
+app.set('view engine', 'hbs');
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
+require('./routes/router')(app);
