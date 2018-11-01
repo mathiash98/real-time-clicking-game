@@ -1,0 +1,16 @@
+{
+  "name": "real-time-mafia-game",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "~4.16.0",
+    "express-handlebars": "^3.0.0",
+    "mongoose": "^5.3.8",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0"
+  }
+}
