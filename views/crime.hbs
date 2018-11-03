@@ -1,0 +1,34 @@
+<div class="list-group" id="crimelist">
+    {{#each crimes}}
+        <button type="button" class="list-group-item list-group-item-action" data-crimeid="{{this._id}}">{{this.name}} - difficulty: {{this.difficulty}} - required level: {{this.level}}</button>
+    {{/each}}
+</div>
+
+<span id="crimeResponseBox" style="color:white;"></span>
+
+
+<script>
+document.getElementById('crimelist').addEventListener('click', function(e){
+    e.stopPropagation();
+    let crimeid = e.target.dataset.crimeid;
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+        console.log(this.responseText);
+        let res = JSON.parse(this.responseText);
+        let crimeResponseBox = document.getElementById('crimeResponseBox');
+        crimeResponseBox.innerHTML = res.msg;
+        if(res.success){
+            crimeResponseBox.style.backgroundColor = 'green';
+        }else {
+            crimeResponseBox.style.backgroundColor = 'red';
+        }
+    }
+    });
+
+    xhr.open("POST", "/api/crime/"+crimeid+"/perform");
+    xhr.send();
+});
+</script>

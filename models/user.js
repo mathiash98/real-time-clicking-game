@@ -5,6 +5,7 @@ var SALT_WORK_FACTOR = 10;
 
 // Dependent models
 const Item = require('./item');
+const City = require('./city');
 
 var userSchema = new mongoose.Schema({
       username: {
@@ -29,6 +30,13 @@ var userSchema = new mongoose.Schema({
         type: Number,
         default: 0
       },
+      attackPoints: {type: Number, default: 0},
+      defencePoints: {type: Number, default: 0},
+      jail: {type: Boolean, default: false},
+      jailInfo: {
+        start: Date,
+        end: Date
+      },
       money: {
         type: Number,
         default: 1000
@@ -37,6 +45,7 @@ var userSchema = new mongoose.Schema({
         type: Number,
         default: 100
       },
+      _city: {type: Number, ref: 'City'},
       _inventory: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item' }],
@@ -65,7 +74,7 @@ userSchema.pre('save', function(next) {
 });
 
 userSchema.methods.comparePassword = function(pass, cb) {
-  console.log("==========Comparing password================");
+  // console.log("==========Comparing password================");
     bcrypt.compare(pass, this.local_login.password, function(err, isMatch) {
         if (err) {
           console.log(err);

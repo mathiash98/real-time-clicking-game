@@ -10,7 +10,7 @@ var itemSchema = new mongoose.Schema({
     _owner: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     description: String,
     level: {type: Number, default: 0},
-    _category: {type: mongoose.Schema.Types.ObjectId, ref: 'Category'},
+    _category: {type: Number, ref: 'Category'},
     details: {
         damage: Number,
         speed: Number,

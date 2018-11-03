@@ -13,11 +13,11 @@ module.exports = function (app) {
         next();
     });
     app.use(function (req, res, next) {
-       res.locals.user = req.user;
-       next();
-    });
-    app.use(function (req, res, next) {
-        console.log(req.ip, req.user);
+        if (req.user) {
+            console.log(req.ip, req.user.username);
+        } else {
+            console.log(req.ip);
+        }
         next();
     });
 

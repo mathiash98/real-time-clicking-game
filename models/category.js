@@ -1,5 +1,6 @@
 console.log('Hello from category.js');
 const mongoose = require('mongoose');
+const autoinc = require('mongoose-plugin-autoinc').autoIncrement;
 
 // Dependent models
 
@@ -15,5 +16,5 @@ categorySchema.pre('save', function(next) {
     return next();
 });
 
-
+categorySchema.plugin(autoinc, 'Category');
 module.exports = mongoose.model('Category', categorySchema);
