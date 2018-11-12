@@ -2,6 +2,7 @@ const app = require('express').Router();
 
 // required models 
 const Crime = require('../models/crime');
+const City = require('../models/city');
 
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
@@ -38,6 +39,17 @@ app.get('/crime', isLoggedIn, function (req, res) {
     });
 });
 
+app.get('/city', isLoggedIn, function (req, res) {
+    City.find()
+    .sort({'difficulty': 1})
+    .exec(function (err, cities) {
+        res.render('city', {'cities': cities});
+    });
+});
+
+app.get(['/admin', '/admin/:adminpage'], isAdmin, function (req, res) {
+    res.render('admin');
+});
 
 app.get('/favicon.ico', function(req, res){/*code*/});
 

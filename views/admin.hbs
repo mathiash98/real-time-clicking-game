@@ -1,0 +1,91 @@
+<div class="container-fluid">
+    <div class="col-sm-3">
+        <div class="list-group" id="adminPageNavList">
+            <a href="/admin/player" class="list-group-item list-group-item-action active">Players</a>
+            <a href="/admin/crime" class="list-group-item list-group-item-action">Crimes</a>
+            <a href="/admin/city" class="list-group-item list-group-item-action">City</a>
+        </div>
+    </div>
+    <div class="col-sm-9" id="adminPageContainer">
+        
+    </div>
+</div>
+
+<script>
+    let adminPageContainer = document.getElementById('adminPageContainer');
+    let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
+
+    document.getElementById('adminPageNavList').addEventListener('click', function(evt){
+        evt.preventDefault();
+        lastActiveNavListEl.classList.toggle('active');
+        evt.target.classList.toggle('active');
+        lastActiveNavListEl = evt.target;
+
+        history.pushState({
+            url: evt.target.href,
+            title: 'Admin: ' + evt.target.innerHTML
+        }, 'Admin: ' + evt.target.innerHTML, evt.target.href);
+
+        document.title = 'Admin: ' + evt.target.innerHTML;
+
+        checkURL();
+    });
+
+    window.onpopstate = function(event) {
+        /* is only runned when user click back button in browser 
+           so everytime user clicks a link in the adminPageNavList the eventlistener there has to run check url function*/
+        console.log(event);
+    };
+
+
+function checkURL() {
+    console.log(document.URL);
+
+    if (document.URL.indexOf('player')) {
+        renderPlayerList(getPlayerList())
+    }
+}
+
+function getPlayerList() {
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+        console.log(this.responseText);
+        return JSON.parse(this.responseText);
+    }
+    });
+
+    xhr.open("GET", "/api/player");
+    xhr.send();
+}
+
+function renderPlayerList(users) {
+    console.log(users);
+    let tmpEl = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>Admin</th>
+                        <th>money</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${users.map(player => `<tr>
+                        <td>${player.username}</td>
+                        <td>${player.level}</td>
+                        <td>${player.admin}</td>
+                        <td>${player.money}</td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderAdminContainer(target) {
+    console.log(target);
+
+}
+</script>
