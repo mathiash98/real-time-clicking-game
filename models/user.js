@@ -46,11 +46,13 @@ var userSchema = new mongoose.Schema({
         default: 100
       },
       _city: {type: Number, ref: 'City', default: 0},
-      _inventory: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Item' }],
+      _inventory: {
+        _weapons: [{
+          type: Number,
+          ref: "Weapon"}]
+      },
       _equipped: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Number,
         ref: 'Item' }],
       active: {type: Boolean, default: true},
       added: { type: Date, default: Date.now },

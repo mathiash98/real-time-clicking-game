@@ -1,0 +1,21 @@
+.title {
+    text-align: center;
+    font-style: italic;
+}
+
+th {
+    padding-right: 100px;
+    font-size: 6;
+}
+.Emma {
+    color: royalblue;
+    font-style: arial;
+}
+/* table {
+    align : center;
+} */
+
+button {
+    width: 100px;
+    height: 60px;
+}

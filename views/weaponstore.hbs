@@ -1,0 +1,50 @@
+<table id="weaponlist" align="center">
+    <thead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Damage</th>
+        <th>Level</th>
+
+    </thead>
+    <tbody>
+        {{#each weapons}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.price}}</td>
+                <td>{{this.damage}}</td>
+                <td>{{this.level}}</td>
+                <td><button type="button" class="btn btn-outline-secondary btn-sm" data-weaponid="{{this._id}}">Buy</button></td>
+            </tr>
+        {{/each}}
+            
+    </tbody>
+</table> 
+
+<span id="BuyResponseBox" syle="color: white;"></span>
+
+<script>
+    document.getElementById("weaponlist").addEventListener("click",function(e){
+        e.stopPropagation();
+        let weaponid = e.target.dataset.weaponid;
+        if(weaponid) {
+            console.log(e);
+            console.log(weaponid);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.addEventListener("readystatechange", function () {
+                if(this.readyState === 4) {
+                    console.log(this);
+                    console.log(this.responseText);
+                    let res = JSON.parse(this.responseText);
+                    let BuyResponseBox = document.getElementById("BuyResponseBox");
+                    BuyResponseBox.innerHTML = res.msg;
+                }
+            });
+
+            xhr.open("POST","/api/weapon/"+weaponid+"/purchase");
+            xhr.send();
+        }
+        });
+</script>
+

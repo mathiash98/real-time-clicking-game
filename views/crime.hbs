@@ -1,3 +1,4 @@
+{{crimes}}
 <div class="list-group" id="crimelist">
     {{#each crimes}}
         <button type="button" class="list-group-item list-group-item-action" data-crimeid="{{this._id}}">{{this.name}} - difficulty: {{this.difficulty}} - required level: {{this.level}}</button>
@@ -11,14 +12,18 @@
 document.getElementById('crimelist').addEventListener('click', function(e){
     e.stopPropagation();
     let crimeid = e.target.dataset.crimeid;
+    console.log(e)
 
     var xhr = new XMLHttpRequest();
 
-    xhr.addEventListener("readystatechange", function () {
+//Når xhr blir sendt, så begynner denne her å lytte. Hvis readystate er lik 4. Når den er ferdig konverteres 
+    xhr.addEventListener("readystatechange", function () { 
     if (this.readyState === 4) {
-        console.log(this.responseText);
-        let res = JSON.parse(this.responseText);
+        console.log(this)
+        console.log("response",this.responseText);
+        let res  = JSON.parse(this.responseText);
         let crimeResponseBox = document.getElementById('crimeResponseBox');
+        console.log(crimeResponseBox)
         crimeResponseBox.innerHTML = res.msg;
         if(res.success){
             crimeResponseBox.style.backgroundColor = 'green';
@@ -28,7 +33,7 @@ document.getElementById('crimelist').addEventListener('click', function(e){
     }
     });
 
-    xhr.open("POST", "/api/crime/"+crimeid+"/perform");
-    xhr.send();
+    xhr.open("POST", "/api/crime/"+crimeid+"/perform"); //Definerer om det skal være get, post , delete osv og hvor den skal sendes til for eks. /api/crime
+    xhr.send(); 
 });
-</script>
+</script>   

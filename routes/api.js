@@ -6,6 +6,7 @@ const Category = require('../models/category');
 const Item = require('../models/item');
 const City = require('../models/city');
 const Crime = require('../models/crime');
+const Weapon = require("../models/weapon");
 
 function isLoggedInJson(req, res, next) {
     if(req.isAuthenticated()) {
@@ -57,7 +58,6 @@ api.get('/player/:username', function (req, res) {
 });
 
 api.put('/player/:username', isLoggedInJson, function (req, res) {
-    console.log(req.body);
     if (req.user.admin || req.user.username == req.params.username){
         User.findOne({'username': req.params.username})
         .exec(function(err, user) {
@@ -108,6 +108,94 @@ api.get('/item/:itemid', function (req, res) {
        }
     });
 });
+// ==================================================================================
+// ===========================     Weapon API STUFF      ============================
+// ==================================================================================
+
+api.get("/weapon",function(req, res) {
+    Weapon.find()
+    .sort({level: 1})
+    .exec(function(err,data) {
+        if(err) {
+            console.log(err);
+            res.status(500).send(err);        
+        } else {
+            res.json(data)
+        }
+    });
+});
+
+api.post("/weapon", isAdminJson ,function(req, res) {
+    console.log(req.body)
+    let newWeapon = new Weapon();
+    newWeapon.price = req.body.price;
+    newWeapon.damage = req.body.damage;
+    newWeapon.name = req.body.name;
+    newWeapon.level = req.body.level;
+    if(req.body.description){
+        newWeapon.description = req.body.description;
+    }
+    newWeapon.save(function (err,data) {
+    if (err) {
+        console.log(err)
+        res.status(500).send(err);
+    } else {
+        res.json(data)
+    }
+    });
+});
+
+api.get("/weapon/:weaponid", function (req,res) {
+    Weapon.findById(req.params.weaponid)
+    .exec(function (err, data) {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(data);
+        }
+    });
+});
+
+api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
+    Weapon.findById(req.params.weaponid)
+    .exec(function (err, weapon){
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            if (req.user.money < weapon.price) {
+                res.json({
+                    "success": false,
+                    "msg": "You need to have a minimum of" + weapon.price + " to buy this weapon."
+                });
+            } else if (req.user.level < weapon.level) {
+                res.json({
+                    "success": false,
+                    "msg": "You need to have a minimum level of " + weapon.level + " to buy this weapon."
+                });
+            } else {
+                req.user.money -= weapon.price;
+                console.log("Weapon id",weapon._id)
+                console.log("Inventory",req.user._inventory._weapons)
+                req.user._inventory._weapons.push(weapon._id)
+                req.user.save(function (err, data) {
+                    if(err) {
+                        console.log(err)
+                        res.status(500).send(err);
+                    } else {
+                        res.json({
+                            "success": true,
+                            "msg": "You have bougth " + weapon.name + "!" 
+                        });
+                    }
+                });
+            }
+
+        }
+
+    });
+});
+
 
 // ==================================================================================
 // ===========================     CATEGORY API STUFF    ============================
