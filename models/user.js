@@ -45,7 +45,7 @@ var userSchema = new mongoose.Schema({
         type: Number,
         default: 100
       },
-      _city: {type: Number, ref: 'City'},
+      _city: {type: Number, ref: 'City', default: 0},
       _inventory: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Item' }],

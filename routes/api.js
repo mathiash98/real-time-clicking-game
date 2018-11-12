@@ -159,6 +159,69 @@ api.get('/city', function (req, res) {
    }); 
 });
 
+api.get(['/city/:cityid', '/city/:cityid/:cityname'], function (req, res) {
+   City.findById(req.params.cityid, function (err, data) {
+    if (err) {
+        console.log(err);
+        res.status(500).send(err);
+    } else {
+        res.json(data)
+    }
+   }); 
+});
+
+api.get('/city/:cityid/:cityname/travel', isLoggedInJson, function (req, res) {
+    // Need some mechanics to check if player is allowed to travel
+    // Travel cooldown
+    // Prison or not?
+    // Alive or not?
+    // Hotel?
+    // In hospital?
+    // Check if any upcoming planned robberies which won't work if user isn't in city
+    
+    // Check if user already in city
+    if (req.params.cityid == req.user._city) {
+        res.status(400).json({
+            success: false,
+            msg: 'You are already in ' + req.params.cityname
+        });
+    } else {
+        // Look up the city
+        City.findById(req.params.cityid, function (err, data) {
+            if (err) {
+                console.log(err);
+                res.status(500).send(err);
+            } else {
+                // Check if level is high enough
+                if (data.level >= req.user.level) {
+                    // need to check if user has enough money to travel, but no checking atm
+                    
+                    // Updates user's _city and saves it
+                    req.user._city = data._id;
+                    req.user.save(function (err, updated_user) {
+                        if (err) {
+                            console.log(err);
+                            res.status(500).send(err);
+                        } else {
+                            res.json({
+                                success: true,
+                                msg: 'You just traveled to ' + data.name + '.'
+                            });
+                        } 
+                    });
+                } else {
+                    // Required level for city is higher than user's level
+                    res.status(401).json({
+                        success: false,
+                        msg: 'You need to be level ' + data.level + ' to travel to ' + data.name + '.'
+                    });
+                }
+            } 
+        });
+    }
+
+});
+
 api.post('/city', isAdminJson, function (req, res) {
    let newCity = new City();
    newCity.name = req.body.name;
@@ -260,9 +323,13 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                 console.log(req.user);
                 console.log('User.level ' + req.user.level);
                 console.log(req.user.username + ' is doing crime: ' + crime.name + '. Will it succed with these params? ' + req.user.level + ' - ' + crime.level + ' - ' + getRandomInt(req.user.level, crime.difficulty));
+                // Make some stupid random calc based on difficulty and check if crime is succeded
                 if (getRandomInt(req.user.level, crime.difficulty) > 6) {
+                    // Makes a random payout inbetween min and max
                     let payout = getRandomInt(crime.minPayout, crime.maxPayout);
+                    // Updates the user with money
                     req.user.money += payout;
+                    // Saves the updated user
                     req.user.save(function (err, updatedUser) {
                        if(err) {
                            res.status(500).send(err);
