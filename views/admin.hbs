@@ -1,21 +1,28 @@
 <div class="container-fluid">
-    <div class="col-sm-3">
-        <div class="list-group" id="adminPageNavList">
-            <a href="/admin/player" class="list-group-item list-group-item-action active">Players</a>
-            <a href="/admin/crime" class="list-group-item list-group-item-action">Crimes</a>
-            <a href="/admin/city" class="list-group-item list-group-item-action">City</a>
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="list-group" id="adminPageNavList">
+                <a href="/admin/player" class="list-group-item list-group-item-action active">Players</a>
+                <a href="/admin/crime" class="list-group-item list-group-item-action">Crimes</a>
+                <a href="/admin/city" class="list-group-item list-group-item-action">City</a>
+            </div>
         </div>
-    </div>
-    <div class="col-sm-9" id="adminPageContainer">
-        
+        <div class="col-sm-8" id="adminPageContainer">
+            
+        </div>
+
     </div>
 </div>
+
+
 
 <script>
     let adminPageContainer = document.getElementById('adminPageContainer');
     let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
-
+    checkURL();
+    
     document.getElementById('adminPageNavList').addEventListener('click', function(evt){
+        /**/
         evt.preventDefault();
         lastActiveNavListEl.classList.toggle('active');
         evt.target.classList.toggle('active');
@@ -37,36 +44,112 @@
         console.log(event);
     };
 
-
-function checkURL() {
-    console.log(document.URL);
-
-    if (document.URL.indexOf('player')) {
-        renderPlayerList(getPlayerList())
-    }
-}
-
-function getPlayerList() {
+function adminPagePostFormHandler(e, el) {
+    e.preventDefault();
+    let form = new FormData(el);
+    console.log(el);
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("readystatechange", function () {
     if (this.readyState === 4) {
         console.log(this.responseText);
-        return JSON.parse(this.responseText);
+        renderCityList(JSON.parse(this.responseText));
     }
     });
 
-    xhr.open("GET", "/api/player");
-    xhr.send();
+    xhr.open("POST", el.action);
+    xhr.send(form);
 }
 
-function renderPlayerList(users) {
-    console.log(users);
+function checkURL() {
+    /*Gets the current url and checks if it contains some of the defined pages or whatever*/
+    let url = '';
+    if (history.state == null) {
+        url = document.URL;
+    } else {
+        url = history.state.url;
+    }
+    console.log(url, url.indexOf('crime'));
+    if (url.indexOf('player') >= 0) {
+        getDataAndRunCB('player', renderPlayerList);
+    } else if(url.indexOf('crime') >= 0){
+        getDataAndRunCB('crime', renderCrimeList);
+    } else if(url.indexOf('city') >= 0){
+        getDataAndRunCB('city', renderCityList);
+    }
+}
+
+
+function renderCityList(cities) {
+    let tmpEl = `
+            <form action="/api/city" method="post" onsubmit="adminPagePostFormHandler(event, this)" id="adminPagePostForm">
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="level" placeholder="Level">
+                </div>
+                <button type="submit" class="btn btn-primary">Post city</button>
+            </form>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cities.map(city => `<tr>
+                        <td>${city.name}</td>
+                        <td>${city.level}</td>
+                        <td>${city.active}</td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderCrimeList(crimes) {
     let tmpEl = `
             <table class="table">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Level</th>
+                        <th>_city</th>
+                        <th>difficulty</th>
+                        <th>minPayout</th>
+                        <th>maxPayout</th>
+                        <th>active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${crimes.map(crime => `<tr>
+                        <td>${crime.name}</td>
+                        <td>${crime.level}</td>
+                        <td>${crime._city}</td>
+                        <td>${crime.difficulty}</td>
+                        <td>${crime.minPayout}</td>
+                        <td>${crime.maxPayout}</td>
+                        <td>${crime.active}</td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderPlayerList(users) {
+    let tmpEl = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>City</th>
                         <th>Admin</th>
                         <th>money</th>
                     </tr>
@@ -75,6 +158,7 @@ function renderPlayerList(users) {
                     ${users.map(player => `<tr>
                         <td>${player.username}</td>
                         <td>${player.level}</td>
+                        <td>${player._city}</td>
                         <td>${player.admin}</td>
                         <td>${player.money}</td>
                     </tr>`)}
@@ -84,8 +168,16 @@ function renderPlayerList(users) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
-function renderAdminContainer(target) {
-    console.log(target);
+function getDataAndRunCB(target, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+        console.log(this.responseText);
+        cb(JSON.parse(this.responseText));
+    }
+    });
 
+    xhr.open("GET", "/api/"+target);
+    xhr.send();
 }
 </script>
