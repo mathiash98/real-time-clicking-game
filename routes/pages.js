@@ -2,7 +2,11 @@ const app = require('express').Router();
 
 // required models 
 const Crime = require('../models/crime');
+<<<<<<< HEAD
 const Weapon = require("../models/weapon");
+=======
+const City = require('../models/city');
+>>>>>>> 5ea0a01774f0cff239255edef74520665b935c65
 
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
@@ -40,6 +44,7 @@ app.get('/crime', isLoggedIn, function (req, res) {
     });
 });
 
+<<<<<<< HEAD
 app.get("/weaponstore",isLoggedIn, function (req, res) {
     Weapon.find(function (err,weapons) {
         console.log(weapons)
@@ -48,6 +53,19 @@ app.get("/weaponstore",isLoggedIn, function (req, res) {
     });
 });
 
+=======
+app.get('/city', isLoggedIn, function (req, res) {
+    City.find()
+    .sort({'difficulty': 1})
+    .exec(function (err, cities) {
+        res.render('city', {'cities': cities});
+    });
+});
+
+app.get(['/admin', '/admin/:adminpage'], isAdmin, function (req, res) {
+    res.render('admin');
+});
+>>>>>>> 5ea0a01774f0cff239255edef74520665b935c65
 
 app.get('/favicon.ico', function(req, res){/*code*/});
 

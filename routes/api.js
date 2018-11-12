@@ -33,8 +33,14 @@ api.get('/test', function (req, res) {
 // ==================================================================================
 
 api.get('/player', function (req, res) {
+    let fields = ['username', 'admin', 'level', 'money'];
+    if (req.user){
+        if(req.user.admin){
+            fields.concat(['_city', '_inventory', '_equipped', 'jail']);
+        }
+    }
     User.find()
-    .select('username admin level money')
+    .select(fields)
     .sort({level: -1})
     .exec(function (err, data) {
        if (err) {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .title {
     text-align: center;
     font-style: italic;
@@ -18,4 +19,8 @@ th {
 button {
     width: 100px;
     height: 60px;
+=======
+td {
+    font-size: 2rem;
+>>>>>>> 5ea0a01774f0cff239255edef74520665b935c65
 }

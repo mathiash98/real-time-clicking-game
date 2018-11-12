@@ -1,0 +1,34 @@
+<div class="list-group" id="citylist">
+    {{#each cities}}
+        <button type="button" class="list-group-item list-group-item-action" data-cityid="{{this._id}}">{{this.name}} - required level: {{this.level}}</button>
+    {{/each}}
+</div>
+
+<span id="responseBox" style="color:white;"></span>
+
+
+<script>
+document.getElementById('citylist').addEventListener('click', function(e){
+    e.stopPropagation();
+    let cityid = e.target.dataset.cityid;
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.addEventListener("readystatechange", function () {
+    if (this.readyState === 4) {
+        console.log(this.responseText);
+        let res = JSON.parse(this.responseText);
+        let responseBox = document.getElementById('responseBox');
+        responseBox.innerHTML = res.msg;
+        if(res.success){
+            responseBox.style.backgroundColor = 'green';
+        }else {
+            responseBox.style.backgroundColor = 'red';
+        }
+    }
+    });
+
+    xhr.open("POST", "/api/city/"+cityid+"/travel");
+    xhr.send();
+});
+</script>
