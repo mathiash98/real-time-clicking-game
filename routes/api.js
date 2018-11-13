@@ -183,7 +183,7 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
                 req.user.money -= weapon.price;
                 console.log("Weapon id",weapon._id)
                 console.log("Inventory",req.user._inventory._weapons)
-                req.user._inventory._weapons.push(weapon._id)
+                req.user._inventory._weapons.push(weapon)
                 req.user.save(function (err, data) {
                     if(err) {
                         console.log(err)
@@ -253,8 +253,8 @@ api.get('/city', function (req, res) {
    }); 
 });
 
-api.get(['/city/:cityid', '/city/:cityid/:cityname'], function (req, res) {
-   City.findById(req.params.cityid, function (err, data) {
+api.get('/city/:cityname', function (req, res) {
+   City.findOne({'name': req.params.cityname}, function (err, data) {
     if (err) {
         console.log(err);
         res.status(500).send(err);
@@ -264,7 +264,7 @@ api.get(['/city/:cityid', '/city/:cityid/:cityname'], function (req, res) {
    }); 
 });
 
-api.get('/city/:cityid/:cityname/travel', isLoggedInJson, function (req, res) {
+api.get('/city/:cityname/travel', isLoggedInJson, function (req, res) {
     // Need some mechanics to check if player is allowed to travel
     // Travel cooldown
     // Prison or not?
@@ -274,24 +274,24 @@ api.get('/city/:cityid/:cityname/travel', isLoggedInJson, function (req, res) {
     // Check if any upcoming planned robberies which won't work if user isn't in city
     
     // Check if user already in city
-    if (req.params.cityid == req.user._city) {
+    if (req.params.cityname == req.user._city) {
         res.status(400).json({
             success: false,
             msg: 'You are already in ' + req.params.cityname
         });
     } else {
         // Look up the city
-        City.findById(req.params.cityid, function (err, data) {
+        City.findOne({"name": req.params.cityname}, function (err, data) {
             if (err) {
                 console.log(err);
                 res.status(500).send(err);
             } else {
                 // Check if level is high enough
-                if (data.level >= req.user.level) {
+                if (req.user.level > data.level) {
                     // need to check if user has enough money to travel, but no checking atm
                     
                     // Updates user's _city and saves it
-                    req.user._city = data._id;
+                    req.user._city = data.name;
                     req.user.save(function (err, updated_user) {
                         if (err) {
                             console.log(err);
