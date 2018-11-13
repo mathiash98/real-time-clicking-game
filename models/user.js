@@ -26,6 +26,15 @@ var userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
       },
+      xp: {
+        type: Number,
+        default:0
+      },
+      xp_to_level: {
+        type: Number,
+        default: 100
+      },
+
       level: {
         type: Number,
         default: 0

@@ -1,4 +1,3 @@
-{{crimes}}
 <div class="list-group" id="crimelist">
     {{#each crimes}}
         <button type="button" class="list-group-item list-group-item-action" data-crimeid="{{this._id}}">{{this.name}} - difficulty: {{this.difficulty}} - required level: {{this.level}}</button>
@@ -19,11 +18,8 @@ document.getElementById('crimelist').addEventListener('click', function(e){
 //Når xhr blir sendt, så begynner denne her å lytte. Hvis readystate er lik 4. Når den er ferdig konverteres 
     xhr.addEventListener("readystatechange", function () { 
     if (this.readyState === 4) {
-        console.log(this)
-        console.log("response",this.responseText);
         let res  = JSON.parse(this.responseText);
         let crimeResponseBox = document.getElementById('crimeResponseBox');
-        console.log(crimeResponseBox)
         crimeResponseBox.innerHTML = res.msg;
         if(res.success){
             crimeResponseBox.style.backgroundColor = 'green';

@@ -14,7 +14,10 @@ var crimeSchema = new mongoose.Schema({
     maxPayout: {type: Number, required: true},
     minPayout: {type: Number, required: true},
     added: { type: Date, default: Date.now },
-    edited: { type: Date, default: Date.now }
+    edited: { type: Date, default: Date.now },
+    msgSuccess: { type: String, required: true},
+    msgFalse: {type: String, required: true},
+    experience: {type: Number, required: true}
 });
 
 crimeSchema.pre('save', function(next) {
