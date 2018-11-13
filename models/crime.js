@@ -8,7 +8,7 @@ const City = require('./city');
 var crimeSchema = new mongoose.Schema({
     name: {type: String, required: true},
     active: {type: Boolean, default: true},
-    _city: {type: Number, ref: 'City'},
+    _city: {type: String},
     level: {type: Number, required: true},
     difficulty: {type: Number, required: true},
     maxPayout: {type: Number, required: true},

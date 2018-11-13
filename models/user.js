@@ -45,11 +45,18 @@ var userSchema = new mongoose.Schema({
         type: Number,
         default: 100
       },
-      _city: {type: Number, ref: 'City', default: 0},
+      _city: {type: String, default: "Bergen"},
       _inventory: {
         _weapons: [{
-          type: Number,
-          ref: "Weapon"}]
+          _id: Number,
+          name:{type: String},
+          price:{type: Number,default: 0},
+          damage:{type: Number,default: 0},
+          level:{type: Number, default: 0}
+        }],
+        cars: [{
+
+        }]
       },
       _equipped: [{
         type: Number,

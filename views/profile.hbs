@@ -1,5 +1,19 @@
-<h1>Hello {{user.username}}</h1>
 
-<h2>Admin: {{user.admin}}</h2>
-<h2>Id: {{user._id}}</h2>
+<table id="users">
+    <tbody>
+        <ul style="" >
+            <li>Username: {{user.username}}</li>
+            <li>Level: {{user.level}}</li>
+            <li>HP: {{user.hp}}</li>
+            <li>Weapons:    
+                {{#each user._inventory._weapons}}
+                    {{this.name}}
+                {{/each}}
+            </li>
+            <li>City:  {{user._city}}</li>
+            <li>Money:  {{user.money}}</li>
+        </ul>
+    </tbody>
+</table>
+
 
