@@ -1,5 +1,5 @@
 
-<h1 align="center">Weapon and Armour Store</h1>
+<h1 align="center">Weapon and Armor Store</h1>
 <table class="weapandarm" id="weaponlist" align="center">
     <h2 align="center">Weapons</h2>
     <thead>
@@ -45,7 +45,7 @@
 </script>
 
 <table class="weapandarm" id="armourlist" align="center">
-    <h2 align="center">Armour</h2>
+    <h2 align="center">Armor</h2>
     <thead>
         <th>Name</th>
         <th>Price</th>
@@ -65,27 +65,27 @@
     </tbody>
 </table>
 
-<span id="BuyResponseArmour"></span>
+<span id="BuyResponseArmor"></span>
 
 <script>
-    document.getElementById("armourlist").addEventListener("click",function(e) {
+    document.getElementById("armorlist").addEventListener("click",function(e) {
         e.stopPropagation();
-        let armourid = e.target.dataset.armourid;
+        let armorid = e.target.dataset.armorid;
         console.log(e)
-        console.log(armourid)
-        if(armourid) {
+        console.log(armorid)
+        if(armorid) {
             var xhr = new XMLHttpRequest();
 
             xhr.addEventListener("readystatechange",function() {
                 if(this.readyState === 4) {
                     let res = JSON.parse(this.responseText);
-                    let BuyResponseArmour = document.getElementById("BuyResponseArmour");
-                    console.log(BuyResponseArmour)
-                    BuyResponseArmour.innerHTML = res.msg;
+                    let BuyResponseArmour = document.getElementById("BuyResponseArmor");
+                    console.log(BuyResponseArmor)
+                    BuyResponseArmor.innerHTML = res.msg;
                     console.log(res.msg)
                 }
             });
-            xhr.open("POST","/api/armour/"+armourid+"/purchase");
+            xhr.open("POST","/api/armor/"+armorid+"/purchase");
             xhr.send();
         }
     });
