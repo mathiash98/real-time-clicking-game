@@ -10,6 +10,11 @@
                     {{this.name}}
                 {{/each}}
             </li>
+            <li>Armors:    
+                {{#each user._inventory._armors}}
+                    {{this.name}}
+                {{/each}}
+            </li>
             <li>City:  {{user._city}}</li>
             <li>Money:  {{user.money}}</li>
         </ul>

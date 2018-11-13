@@ -63,7 +63,7 @@ var userSchema = new mongoose.Schema({
           damage:{type: Number,default: 0},
           level:{type: Number, default: 0}
         }],
-        _armor: [{
+        _armors: [{
           _id: Number,
           name:{type: String},
           price:{type: Number,default: 0},

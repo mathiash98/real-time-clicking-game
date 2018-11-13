@@ -15,29 +15,7 @@
     /*background-image:url("https://ak7.picdn.net/shutterstock/videos/9083777/thumb/7.jpg");*/
 }
 
-.profile li {
-    padding: 10px;
-    margin: 10px;
-}
 
-.weapandarm th, td {
-    padding: 30px;
-    margin: 10px;
-    text-align: left;
-}
-.weapandarm table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.weapandarm h2 {
-    padding: 20px;
-}
-
-
-.weapandarm tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
 
 
  /*!
