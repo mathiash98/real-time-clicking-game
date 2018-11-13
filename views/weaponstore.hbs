@@ -44,7 +44,7 @@
         });
 </script>
 
-<table class="weapandarm" id="armourlist" align="center">
+<table class="weapandarm" id="armorlist" align="center">
     <h2 align="center">Armor</h2>
     <thead>
         <th>Name</th>
@@ -53,13 +53,13 @@
         <th>Level</th>
     </thead>
     <tbody>
-        {{#each armours}}
+        {{#each armors}}
         <tr>
             <td>{{this.name}}</td>
             <td>{{this.price}}</td>
             <td>{{this.defence}}</td>
             <td>{{this.level}}</td>
-            <td><td><button type="button" class="btn btn-outline-secondary btn-sm" data-armourid="{{this._id}}">Buy</button></td></td>
+            <td><td><button type="button" class="btn btn-outline-secondary btn-sm" data-armorid="{{this._id}}">Buy</button></td></td>
         </tr>
         {{/each}}
     </tbody>

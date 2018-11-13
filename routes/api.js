@@ -6,7 +6,7 @@ const Category = require('../models/category');
 const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
-const Armour = require("../models/armour");
+const Armor = require("../models/armor");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -184,19 +184,19 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
 });
 
 // ==================================================================================
-// ===========================     ARMOUR API STUFF      ============================
+// ===========================     ARMOR API STUFF      ============================
 // ==================================================================================
-api.post("/armour", isAdminJson, function(req,res) {
+api.post("/armor", isAdminJson, function(req,res) {
     console.log(req.body)
-    let newArmour = new Armour();
-    newArmour.name = req.body.name;
-    newArmour.price = req.body.price;
-    newArmour.defence = req.body.defence;
-    newArmour.level = req.body.level;
+    let newArmor = new Armor();
+    newArmor.name = req.body.name;
+    newArmor.price = req.body.price;
+    newArmor.defence = req.body.defence;
+    newArmor.level = req.body.level;
     if(req.body.description) {
-        newArmour.description = req.body.description;
+        newArmor.description = req.body.description;
     }
-    newArmour.save(function (err,data) {
+    newArmor.save(function (err,data) {
         if(err) {
             console.log(err);
             res.status(500).send(err);
@@ -206,27 +206,27 @@ api.post("/armour", isAdminJson, function(req,res) {
     });
 });
 
-api.post("/armour/:armourid/purchase", isLoggedInJson, function(req,res) {
-    Armour.findById(req.params.armourid)
-    .exec(function(err, armour) {
+api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
+    Armor.findById(req.params.armorid)
+    .exec(function(err, armor) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            if (req.user.money < armour.price) {
+            if (req.user.money < armor.price) {
                 res.json({
                     "success": false,
-                    "msg": "You need to have a minimum of " + armour.price + " to buy this armour."
+                    "msg": "You need to have a minimum of " + armor.price + " to buy this armor."
                 });
-            } else if (req.user.level < armour.level) {
+            } else if (req.user.level < armor.level) {
                 res.json({
                     "success":false,
-                    "msg": "You need to have a minimum level of " + armour.level + "to buy this armour"
+                    "msg": "You need to have a minimum level of " + armor.level + "to buy this armor"
                 });
             } else {
-                req.user.money -= armour.price;
-                console.log(armour.id)
-                req.user._inventory._armours.push(armour);
+                req.user.money -= armor.price;
+                console.log(armor.id)
+                req.user._inventory._armors.push(armor);
                 req.user.save(function(err, data) {
                     if (err) {
                         console.log(err);
@@ -235,7 +235,7 @@ api.post("/armour/:armourid/purchase", isLoggedInJson, function(req,res) {
                     } else {
                         res.json({
                             "success": true,
-                            "msg": "You have now bought " + armour.name + " !" 
+                            "msg": "You have now bought " + armor.name + " !" 
                         });
                     }
                 });
