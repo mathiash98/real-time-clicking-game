@@ -27,15 +27,10 @@
         e.stopPropagation();
         let weaponid = e.target.dataset.weaponid;
         if(weaponid) {
-            console.log(e);
-            console.log(weaponid);
-
             var xhr = new XMLHttpRequest();
 
             xhr.addEventListener("readystatechange", function () {
                 if(this.readyState === 4) {
-                    console.log(this);
-                    console.log(this.responseText);
                     let res = JSON.parse(this.responseText);
                     let BuyResponseBox = document.getElementById("BuyResponseBox");
                     BuyResponseBox.innerHTML = res.msg;

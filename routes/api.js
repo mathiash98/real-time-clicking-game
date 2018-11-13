@@ -377,6 +377,9 @@ api.get('/crime', isLoggedInJson, function (req, res) {
 
 api.post('/crime', isAdminJson, function (req, res) {
    let newCrime = new Crime(req.body);
+   newCrime.msgFalse = req.body.msgFalse;
+   newCrime.msgSuccess = req.body.msgSuccess;
+   newCrime.experience = req.body.experience;
    
    newCrime.save(function (err, crime) {
     if (err) {
@@ -410,19 +413,30 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
             if (req.user.level < crime.level) {
                 res.status(400).json({
                     'success': false,
-                    'msg': 'You need to be level: ' + crime.level + ' to perform this crime!'
+                    msg: 'You need to be level: ' + crime.level + ' to perform this crime!'
                 });
             } else {
+
+                //Add experience to the player, based on difficulty of crime.
+
+                
                 // Do some algorith stuff to calculate if you succed
-                console.log(req.user);
-                console.log('User.level ' + req.user.level);
-                console.log(req.user.username + ' is doing crime: ' + crime.name + '. Will it succed with these params? ' + req.user.level + ' - ' + crime.level + ' - ' + getRandomInt(req.user.level, crime.difficulty));
                 // Make some stupid random calc based on difficulty and check if crime is succeded
                 if (getRandomInt(req.user.level, crime.difficulty) > 6) {
                     // Makes a random payout inbetween min and max
                     let payout = getRandomInt(crime.minPayout, crime.maxPayout);
                     // Updates the user with money
                     req.user.money += payout;
+                    req.user.xp += crime.experience;
+                    console.log("User xp: ",req.user.xp)
+                    console.log("experience",crime.experience)
+                    console.log("Xp to level",req.user.xp)
+                    if(req.user.xp == req.user.xp_to_level) {
+                        req.user.xp = 0;
+                        req.user.xp_to_level += req.user.xp_to_level;
+                        req.user.level += 1;
+                    }
+                    
                     // Saves the updated user
                     req.user.save(function (err, updatedUser) {
                        if(err) {
@@ -432,7 +446,7 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                             // etc: you stole a fresh piece of meat and sold it to a hobo for payout 
                            res.json({
                                success: true,
-                               msg: 'You stole a fresh piece of meat and sold it to a hobo for ' + payout + ' money.'
+                               msg: crime.msgSuccess + "You have stolen " + payout + " and recieved a total of " + crime.experience 
                            })
                        }
                     });
@@ -440,7 +454,7 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                     // Need some algorith to check if user goes to jail
                     res.json({
                         success: false,
-                        msg: 'You tripped on the way out, got scared and ran away without the goods.'
+                        msg: crime.msgFalse
                     });
                 }
             }
