@@ -11,23 +11,31 @@
  * What we have made on our own
  */
 
+#navbar {
+    /*background-image:url("https://ak7.picdn.net/shutterstock/videos/9083777/thumb/7.jpg");*/
+}
+
 .profile li {
     padding: 10px;
     margin: 10px;
 }
 
-.weapon th, td {
+.weapandarm th, td {
     padding: 30px;
     margin: 10px;
     text-align: left;
 }
-.weapon table {
+.weapandarm table {
     border-collapse: collapse;
     width: 100%;
 }
 
+.weapandarm h2 {
+    padding: 20px;
+}
 
-.weapon tr:nth-child(even) {
+
+.weapandarm tr:nth-child(even) {
     background-color: #f2f2f2;
 }
 

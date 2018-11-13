@@ -1,6 +1,7 @@
 
-<h2 align="center">Weapon Store</h2>
-<table id="weaponlist" align="center">
+<h1 align="center">Weapon and Armour Store</h1>
+<table class="weapandarm" id="weaponlist" align="center">
+    <h2 align="center">Weapons</h2>
     <thead>
         <th>Name</th>
         <th>Price</th>
@@ -41,4 +42,51 @@
             xhr.send();
         }
         });
+</script>
+
+<table class="weapandarm" id="armourlist" align="center">
+    <h2 align="center">Armour</h2>
+    <thead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Defence</th>
+        <th>Level</th>
+    </thead>
+    <tbody>
+        {{#each armours}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.price}}</td>
+            <td>{{this.defence}}</td>
+            <td>{{this.level}}</td>
+            <td><td><button type="button" class="btn btn-outline-secondary btn-sm" data-armourid="{{this._id}}">Buy</button></td></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<span id="BuyResponseArmour"></span>
+
+<script>
+    document.getElementById("armourlist").addEventListener("click",function(e) {
+        e.stopPropagation();
+        let armourid = e.target.dataset.armourid;
+        console.log(e)
+        console.log(armourid)
+        if(armourid) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.addEventListener("readystatechange",function() {
+                if(this.readyState === 4) {
+                    let res = JSON.parse(this.responseText);
+                    let BuyResponseArmour = document.getElementById("BuyResponseArmour");
+                    console.log(BuyResponseArmour)
+                    BuyResponseArmour.innerHTML = res.msg;
+                    console.log(res.msg)
+                }
+            });
+            xhr.open("POST","/api/armour/"+armourid+"/purchase");
+            xhr.send();
+        }
+    });
 </script>
