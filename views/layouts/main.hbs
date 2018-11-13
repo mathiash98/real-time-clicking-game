@@ -6,8 +6,18 @@
     <link rel='stylesheet' href='/stylesheets/bootstrap.css'/>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
+  <script>
+    let userObject = {{{json user}}};
+    
+    function updateUserNavbar(){
+      document.getElementById("nav-city").innerHTML = userObject._city;
+      document.getElementById("nav-money").innerHTML = userObject.money;
+      console.log(userObject);
+    };
+  </script>
   <body>
     {{> navbar}}
     {{{body}}}
   </body>
+  
 </html>

@@ -507,7 +507,8 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                             // etc: you stole a fresh piece of meat and sold it to a hobo for payout 
                            res.json({
                                success: true,
-                               msg: crime.msgSuccess + "You have stolen " + payout + " and recieved a total of " + crime.experience 
+                               msg: crime.msgSuccess + "You have stolen " + payout + " and recieved a total of " + crime.experience, 
+                               reward: payout
                            })
                        }
                     });

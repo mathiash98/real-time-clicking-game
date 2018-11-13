@@ -23,9 +23,14 @@ document.getElementById('crimelist').addEventListener('click', function(e){
         crimeResponseBox.innerHTML = res.msg;
         if(res.success){
             crimeResponseBox.style.backgroundColor = 'green';
+
+            // update user info in navbar
+            userObject.money += res.reward;
+            updateUserNavbar();
         }else {
             crimeResponseBox.style.backgroundColor = 'red';
         }
+
     }
     });
 

@@ -19,9 +19,6 @@
             
             {{#if user.admin}}
             <li class="nav-item">
-                <a class="nav-link" href="/armourstore">Armour store</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin</a>
             </li>
             {{/if}}
@@ -37,11 +34,13 @@
             </li>
             {{/if}}
         </ul>
+        <span id="nav-user">
         {{#if user}}
-            Name: {{user.username}}
-            Money: {{user.money}}
-            Level: {{user.level}}
-            City: {{user._city}}
+            <p class="nav-item">Name: {{user.username}}</p>
+            <p class="nav-item">Money: <span id="nav-money">{{user.money}}</span></p>
+            <p class="nav-item">Level: {{user.level}}</p>
+            <p class="nav-item">City: <span id="nav-city">{{user._city}}</span></p>
         {{/if}}
+        </span>
     </div>
 </nav>
