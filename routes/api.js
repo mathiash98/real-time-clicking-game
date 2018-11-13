@@ -3,20 +3,21 @@ api = require('express').Router();
 // Models
 var User = require('../models/user');
 const Category = require('../models/category');
-const Item = require('../models/item');
 const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armour = require("../models/armour");
 
 function isLoggedInJson(req, res, next) {
+    /* Expreess middleware, you can use to check if user is logged in, see below for examples */
     if(req.isAuthenticated()) {
         return next();
     }
-    res.status(401).send();
+    res.status(401).send(); // if not logged in, return code 401 (not authorized)
 }
 
 function isAdminJson(req, res, next) {
+    /* Check if user is admin */
     if(req.isAuthenticated()) {
         if (req.user.admin){
             return next();
@@ -25,19 +26,15 @@ function isAdminJson(req, res, next) {
     res.status(401).send();
 }
 
-api.get('/test', function (req, res) {
-   res.send('test'); 
-});
-
 // ==================================================================================
 // ===========================     PLAYER API STUFF    ==============================
 // ==================================================================================
 
 api.get('/player', function (req, res) {
-    let fields = ['username', 'admin', 'level', 'money'];
+    let fields = ['username', 'admin', 'level']; // Defines what fields we will retrieve from the database
     if (req.user){
         if(req.user.admin){
-            fields.concat(['_city', '_inventory', '_equipped', 'jail']);
+            fields = []; // if admin, get all fields
         }
     }
     User.find()
@@ -53,8 +50,14 @@ api.get('/player', function (req, res) {
 });
 
 api.get('/player/:username', function (req, res) {
+    let fields = ['username', 'admin', 'level']; // Defines what fields we will retrieve from the database
+    if (req.user){
+        if(req.user.admin){
+            fields = []; // if admin, get all fields
+        }
+    }
     User.findOne({'username': req.params.username})
-    .select('username admin level money')
+    .select(fields)
     .exec(function (err, data) {
        if (err) {
            res.status(500).send(err);
@@ -65,6 +68,7 @@ api.get('/player/:username', function (req, res) {
 });
 
 api.put('/player/:username', isLoggedInJson, function (req, res) {
+    /* Update a player, currently only admin can change stuff */
     if (req.user.admin || req.user.username == req.params.username){
         User.findOne({'username': req.params.username})
         .exec(function(err, user) {
@@ -74,6 +78,7 @@ api.put('/player/:username', isLoggedInJson, function (req, res) {
                 if(req.user.admin) {
                     if (req.body.money) user.money = req.body.money;
                     if (req.body.level) user.level = req.body.level;
+                    if (req.body.hp) user.hp = req.body.hp;
                 } else if (req.user.username == req.params.username){
                     // Add items to edit on user, currently have nothing to change
                 }
@@ -90,31 +95,6 @@ api.put('/player/:username', isLoggedInJson, function (req, res) {
     }
 });
 
-// ==================================================================================
-// ===========================     ITEM API STUFF    ================================
-// ==================================================================================
-api.get('/item', function (req, res) {
-    User.find()
-    .sort({level: -1})
-    .exec(function (err, data) {
-       if (err) {
-           res.status(500).send(err);
-       } else {
-           res.json(data)
-       }
-    });
-});
-
-api.get('/item/:itemid', function (req, res) {
-    User.findById(req.params.itemid)
-    .exec(function (err, data) {
-       if (err) {
-           res.status(500).send(err);
-       } else {
-           res.json(data)
-       }
-    });
-});
 // ==================================================================================
 // ===========================     Weapon API STUFF      ============================
 // ==================================================================================

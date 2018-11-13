@@ -5,6 +5,7 @@
                 <a href="/admin/player" class="list-group-item list-group-item-action active">Players</a>
                 <a href="/admin/crime" class="list-group-item list-group-item-action">Crimes</a>
                 <a href="/admin/city" class="list-group-item list-group-item-action">City</a>
+                <a href="/admin/weapon" class="list-group-item list-group-item-action">Weapon</a>
             </div>
         </div>
         <div class="col-sm-8" id="adminPageContainer">
@@ -17,64 +18,10 @@
 
 
 <script>
-    let adminPageContainer = document.getElementById('adminPageContainer');
-    let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
-    checkURL();
+let adminPageContainer = document.getElementById('adminPageContainer');
+let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
+checkURL();
     
-    document.getElementById('adminPageNavList').addEventListener('click', function(evt){
-        /**/
-        evt.preventDefault();
-        lastActiveNavListEl.classList.toggle('active');
-        evt.target.classList.toggle('active');
-        lastActiveNavListEl = evt.target;
-
-        history.pushState({
-            url: evt.target.href,
-            title: 'Admin: ' + evt.target.innerHTML
-        }, 'Admin: ' + evt.target.innerHTML, evt.target.href);
-
-        document.title = 'Admin: ' + evt.target.innerHTML;
-
-        checkURL();
-    });
-
-    window.onpopstate = function(event) {
-        /* is only runned when user click back button in browser 
-           so everytime user clicks a link in the adminPageNavList the eventlistener there has to run check url function*/
-        console.log(event);
-    };
-
-function adminPageCityFormSubmit(evt, el) {
-    evt.preventDefault();
-    console.log(el);
-    console.log(el.name);
-    let tmpcity = {
-        name: el.name.value,
-        level: el.level.value
-    }
-    request('POST', 'crime', JSON.stringify(tmpcity), function(data){
-        console.log(data);
-        checkURL();
-    });
-}
-
-function adminPageCrimeFormSubmit(evt, el) {
-    evt.preventDefault();
-    console.log(el);
-    let tmpCrime = {
-        name: el.name.value,
-        level: el.level.value,
-        _city: el._city.value,
-        difficulty: el.difficulty.value,
-        maxPayout: el.maxPayout.value,
-        minPayout: el.minPayout.value
-    }
-    request('POST', 'crime', JSON.stringify(tmpCrime), function(data){
-        console.log(data);
-        checkURL();
-    });
-}
-
 function checkURL() {
     /* Gets the current url and checks if it contains some of the defined pages
        if the page is found, it will get the matching data from API and render the needed data */
@@ -95,9 +42,83 @@ function checkURL() {
         request('GET', 'crime', '', renderCrimeList);
     } else if(url.indexOf('city') >= 0){
         request('GET', 'city', '', renderCityList);
+    } else if(url.indexOf('weapon') >= 0){
+        request('GET', 'weapon', '', renderWeaponList);
     }
 }
 
+document.getElementById('adminPageNavList').addEventListener('click', function(evt){
+    /* Listen for clicks on the navList */
+    evt.preventDefault(); // prevent page redirects for example
+    lastActiveNavListEl.classList.toggle('active');
+    evt.target.classList.toggle('active');
+    lastActiveNavListEl = evt.target;
+
+    // Stuff below used to make single page application
+    history.pushState({ // Pushes the "new" site to history
+        url: evt.target.href,
+        title: 'Admin: ' + evt.target.innerHTML
+    }, 'Admin: ' + evt.target.innerHTML, evt.target.href);
+
+    document.title = 'Admin: ' + evt.target.innerHTML; // Changes title to appropiate title
+
+    checkURL(); // run "router" function which reads url and runs appropiate functions
+});
+
+window.onpopstate = function(event) {
+    /* is only runned when user click back button in browser 
+        so everytime user clicks a link in the adminPageNavList the eventlistener there has to run check url function*/
+    console.log(event);
+};
+
+function adminPageCityFormSubmit(evt, el) {
+    evt.preventDefault();
+    console.log(el);
+    console.log(el.name);
+    let tmpcity = {
+        name: el.name.value,
+        level: el.level.value
+    }
+    request('POST', 'city', JSON.stringify(tmpcity), function(data){
+        console.log(data);
+        checkURL();
+    });
+}
+
+function adminPageCrimeFormSubmit(evt, el) {
+    evt.preventDefault();
+    console.log(el);
+    let tmpCrime = {
+        name: el.name.value,
+        level: el.level.value,
+        _city: el._city.value,
+        difficulty: el.difficulty.value,
+        maxPayout: el.maxPayout.value,
+        minPayout: el.minPayout.value,
+        msgSuccess: el.msgSuccess.value,
+        msgFalse: el.msgFalse.value,
+        experience: el.experience.value
+    };
+    request('POST', 'crime', JSON.stringify(tmpCrime), function(data){
+        console.log(data);
+        checkURL();
+    });
+}
+
+function adminPageWeaponFormSubmit(evt, el) {
+    evt.preventDefault(); // Prevent traditional form action which reloads page
+    console.log(el);
+    let tmpWeapon = {
+        name: el.name.value,
+        price: el.price.value,
+        damage: el.damage.value,
+        level: el.level.value
+    };
+    request('POST', 'weapon', JSON.stringify(tmpWeapon), function(data){
+        console.log(data);
+        checkURL();
+    });
+}
 
 function renderCityList(cities) {
     /* Render the city data plus a form for adding new data 
@@ -164,6 +185,19 @@ function renderCrimeList(crimes) {
                 <input type="number"
                     class="form-control" name="minPayout" placeholder="Min payout" value="1">
                 </div>
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="msgSuccess" placeholder="Successmessage" value="Success">
+                </div>
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="msgFalse" placeholder="Failmessage" value="Fail brooo">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="experience" placeholder="Experience" value="10">
+                </div>
+                </div>
                 <button type="submit" class="btn btn-primary">Add crime</button>
             </form>
             <table class="table" id="adminPageDataTable">
@@ -204,7 +238,8 @@ function renderPlayerList(users) {
                         <th>Level</th>
                         <th>City</th>
                         <th>Admin</th>
-                        <th>money</th>
+                        <th>Money</th>
+                        <th>HP</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -214,6 +249,53 @@ function renderPlayerList(users) {
                         <td>${player._city}</td>
                         <td>${player.admin}</td>
                         <td>${player.money}</td>
+                        <td>${player.hp}</td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderWeaponList(weapons) {
+    /* Render weapons */
+    let tmpEl = `
+            <form action="/api/weapon" method="post" onsubmit="adminPageWeaponFormSubmit(event, this)" id="adminPagePostForm">
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="price" placeholder="Price">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="damage" placeholder="Damage">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="level" placeholder="Level">
+                </div>
+                <button type="submit" class="btn btn-primary">Add weapon</button>
+            </form>
+            <table class="table" id="adminPageDataTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>damage</th>
+                        <th>Level</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${weapons.map(weapon => `<tr>
+                        <td>${weapon.name}</td>
+                        <td>${weapon.price}</td>
+                        <td>${weapon.damage}</td>
+                        <td>${weapon.level}</td>
+                        <td>${weapon.active}</td>
                     </tr>`)}
                 </tbody>
             </table>
