@@ -69,7 +69,7 @@ function adminPageCrimeFormSubmit(evt, el) {
         maxPayout: el.maxPayout.value,
         minPayout: el.minPayout.value
     }
-    request('POST', 'city', JSON.stringify(tmpCrime), function(data){
+    request('POST', 'crime', JSON.stringify(tmpCrime), function(data){
         console.log(data);
         checkURL();
     });
@@ -91,6 +91,7 @@ function checkURL() {
     if (url.indexOf('player') >= 0) {
         request('GET', 'player', '', renderPlayerList);
     } else if(url.indexOf('crime') >= 0){
+        console.log('got crime in url');
         request('GET', 'crime', '', renderCrimeList);
     } else if(url.indexOf('city') >= 0){
         request('GET', 'city', '', renderCityList);
@@ -141,27 +142,27 @@ function renderCrimeList(crimes) {
             <form action="/api/crime" method="post" onsubmit="adminPageCrimeFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
                 <input type="text"
-                    class="form-control" name="name" placeholder="Name">
+                    class="form-control" name="name" placeholder="Name" value="Ran">
                 </div>
                 <div class="form-group">
                 <input type="text"
-                    class="form-control" name="_city" placeholder="City">
+                    class="form-control" name="_city" placeholder="City" value="Bergen">
                 </div>
                 <div class="form-group">
                 <input type="number"
-                    class="form-control" name="level" placeholder="Level">
+                    class="form-control" name="level" placeholder="Level" value="0">
                 </div>
                 <div class="form-group">
                 <input type="number"
-                    class="form-control" name="difficulty" placeholder="Difficulty">
+                    class="form-control" name="difficulty" placeholder="Difficulty" value="10">
                 </div>
                 <div class="form-group">
                 <input type="number"
-                    class="form-control" name="maxPayout" placeholder="Max payout">
+                    class="form-control" name="maxPayout" placeholder="Max payout" value="999">
                 </div>
                 <div class="form-group">
                 <input type="number"
-                    class="form-control" name="minPayout" placeholder="Min payout">
+                    class="form-control" name="minPayout" placeholder="Min payout" value="1">
                 </div>
                 <button type="submit" class="btn btn-primary">Add crime</button>
             </form>
