@@ -1,0 +1,580 @@
+{
+	"info": {
+		"_postman_id": "743b8304-69a9-41bb-8352-ccdf2b1b3ad8",
+		"name": "api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "city",
+			"item": [
+				{
+					"name": "{{IP}}:{{Port}}/api/city",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Stavanger",
+									"type": "text"
+								},
+								{
+									"key": "",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/city",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"city"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/city",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/city",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"city"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/city/:cityid/Bergen",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Bergen",
+									"type": "text"
+								},
+								{
+									"key": "level",
+									"value": "",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/city/5bdcb8bf83300b148c6aea02/Bergen",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"city",
+								"5bdcb8bf83300b148c6aea02",
+								"Bergen"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/city/:cityname/travel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/city/Oslo/travel",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"city",
+								"Oslo",
+								"travel"
+							]
+						},
+						"description": "Travel to a city"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "{{IP}}:{{Port}}/auth/local-login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "bossmeister",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/auth/local-login",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"auth",
+								"local-login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/auth/local-register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "bossmeister",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/auth/local-register",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"auth",
+								"local-register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "player",
+			"item": [
+				{
+					"name": "{{IP}}:{{Port}}/api/player",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/player",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"player"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/player/:playername",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/player/bossmeister",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"player",
+								"bossmeister"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "crime",
+			"item": [
+				{
+					"name": "{{IP}}:{{Port}}/api/crime",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Nask",
+									"type": "text"
+								},
+								{
+									"key": "_city",
+									"value": "Bergen",
+									"type": "text"
+								},
+								{
+									"key": "level",
+									"value": "0",
+									"type": "text"
+								},
+								{
+									"key": "difficulty",
+									"value": "10",
+									"type": "text"
+								},
+								{
+									"key": "maxPayout",
+									"value": "200",
+									"type": "text"
+								},
+								{
+									"key": "minPayout",
+									"value": "4",
+									"type": "text"
+								},
+								{
+									"key": "msgFalse",
+									"value": "You failed sucker",
+									"type": "text"
+								},
+								{
+									"key": "msgSuccess",
+									"value": "You got away and got rich",
+									"type": "text"
+								},
+								{
+									"key": "experience",
+									"value": "10",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/crime",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"crime"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/crime",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/crime",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"crime"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/crime/:crimeid",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/crime/0",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"crime",
+								"0"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Weapon",
+			"item": [
+				{
+					"name": "{{IP}}:{{Port}}/api/weapon",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/weapon",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"weapon"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/weapon/:weaponid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/weapon/0",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"weapon",
+								"0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/weapon",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "Våpen",
+									"description": "Name",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "75",
+									"description": "Price",
+									"type": "text"
+								},
+								{
+									"key": "damage",
+									"value": "8",
+									"description": "Damage or attackpoints",
+									"type": "text"
+								},
+								{
+									"key": "level",
+									"value": "0",
+									"description": "Level Required",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/weapon",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"weapon"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "{{IP}}:{{Port}}/api/weapon/0/purchase",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {},
+						"url": {
+							"raw": "{{IP}}:{{Port}}/api/weapon/0/purchase",
+							"host": [
+								"{{IP}}"
+							],
+							"port": "{{Port}}",
+							"path": [
+								"api",
+								"weapon",
+								"0",
+								"purchase"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
