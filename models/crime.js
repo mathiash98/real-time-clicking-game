@@ -6,7 +6,7 @@ const autoinc = require('mongoose-plugin-autoinc').autoIncrement;
 const City = require('./city');
 
 var crimeSchema = new mongoose.Schema({
-    name: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     active: {type: Boolean, default: true},
     _city: {type: String},
     level: {type: Number, required: true},

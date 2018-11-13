@@ -241,6 +241,7 @@ api.post('/category', isAdminJson, function (req, res) {
 // ==================================================================================
 
 api.get('/city', function (req, res) {
+    /* get a list of all cities */
    City.find()
    .sort({level: 1})
    .exec(function (err, data) {
@@ -248,18 +249,19 @@ api.get('/city', function (req, res) {
         console.log(err);
         res.status(500).send(err);
     } else {
-        res.json(data)
+        res.json(data);
     } 
    }); 
 });
 
 api.get('/city/:cityname', function (req, res) {
+    /* Return specific city based on name */
    City.findOne({'name': req.params.cityname}, function (err, data) {
     if (err) {
         console.log(err);
         res.status(500).send(err);
     } else {
-        res.json(data)
+        res.json(data);
     }
    }); 
 });
@@ -363,54 +365,73 @@ function getRandomInt(min, max) {
   }
 
 api.get('/crime', isLoggedInJson, function (req, res) {
-    Crime.find({'_city': req.user._city})
-    .sort({'level': 1})
+    /* API endpoint for getting a list of crimes avaible in player's current city */
+    let query = {};
+    // if user is not admin, display only crimes in player's city
+    if(!req.user.admin){
+        query._city = req.user._city;
+    }
+    Crime.find(query)
+    .sort({'level': 1}) // Sorts based on level from 0->
     .exec(function (err, data) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            res.json(data)
+            res.json(data);
         } 
     });
 });
 
 api.post('/crime', isAdminJson, function (req, res) {
+<<<<<<< HEAD
    let newCrime = new Crime(req.body);
    newCrime.msgFalse = req.body.msgFalse;
    newCrime.msgSuccess = req.body.msgSuccess;
    newCrime.experience = req.body.experience;
+=======
+    /* Posts a new crime, look in crime model to see properties */
+    let newCrime = new Crime(req.body);
+>>>>>>> 510ac04334f7a8b4ba1f6a4299631fb72f143817
    
    newCrime.save(function (err, crime) {
     if (err) {
         console.log(err);
         res.status(500).send(err);
     } else {
-        res.json(crime)
+        console.log('New crime added:', crime.name);
+        res.json(crime);
     }  
    });
 });
 
-api.get('/crime/:crimeid', isLoggedInJson, function (req, res) {
-    Crime.findOne({'_id': req.params.crimeid, '_city': req.user._city})
+api.get(['/crime/:crimeid', '/crime/:crimeid/:crimename'], isLoggedInJson, function (req, res) {
+    /* Get specific crime based on id and */
+    let query = {'_id': req.params.crimeid};
+    // if user is not admin, display only if crime is in player's city
+    if(!req.user.admin){
+        query._city = req.user._city;
+    }
+    Crime.findOne(query)
     .exec(function (err, crime) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            res.json(crime)
+            res.json(crime);
         } 
     });
 });
 
 api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
+    /* Performs a crime based on id */
     Crime.findOne({'_id': req.params.crimeid, '_city': req.user._city})
     .exec(function (err, crime) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            if (req.user.level < crime.level) {
+            if (req.user.level < crime.level) { //Check if plaer's level is high enough
                 res.status(400).json({
                     'success': false,
                     msg: 'You need to be level: ' + crime.level + ' to perform this crime!'
