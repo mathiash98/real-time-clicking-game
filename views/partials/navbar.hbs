@@ -14,13 +14,19 @@
                 <a class="nav-link" href="/crime">Crime</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/auth/logout">Log out</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/weaponstore">Weapon Store</a>
+            </li>
+            
+            {{#if user.admin}}
+            <li class="nav-item">
+                <a class="nav-link" href="/armourstore">Armour store</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/admin">Admin</a>
+            </li>
+            {{/if}}
+            <li class="nav-item">
+                <a class="nav-link" href="/auth/logout">Log out</a>
             </li>
             {{else}}
             <li class="nav-item">
