@@ -384,15 +384,10 @@ api.get('/crime', isLoggedInJson, function (req, res) {
 });
 
 api.post('/crime', isAdminJson, function (req, res) {
-<<<<<<< HEAD
    let newCrime = new Crime(req.body);
    newCrime.msgFalse = req.body.msgFalse;
    newCrime.msgSuccess = req.body.msgSuccess;
    newCrime.experience = req.body.experience;
-=======
-    /* Posts a new crime, look in crime model to see properties */
-    let newCrime = new Crime(req.body);
->>>>>>> 510ac04334f7a8b4ba1f6a4299631fb72f143817
    
    newCrime.save(function (err, crime) {
     if (err) {
