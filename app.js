@@ -1,33 +1,40 @@
+/* The main file to run
+* Connects to database
+* Starts to listen for http request on port
+* Configures express middlewares
+*/
 // Dependencies
-const express = require('express');
+const express = require('express'); // Module which handles all http requests and rendering of html etc 
 const path = require('path');
-const exphbs = require('express-handlebars');
-const app = express();
-const session = require('express-session');
-const mongoose = require('mongoose');
+const exphbs = require('express-handlebars'); // View engine plugin which allows us to render html based on data 
+const session = require('express-session'); // For passing authentication cookies from request to request, so users doesn't have to login every time
+const mongoose = require('mongoose'); // Database motor
+const app = express(); // Creates an express app,
 
-const config = require('./config');
+const config = require('./config'); // Our config file
 
-// Connect to mongodb
+// Connect to mongodb database
 mongoose.connect(config.mongodb.uri, { useNewUrlParser: true }, function (err) {
     if(err) {throw err;}
-    console.log('Connected to mongodb');
+    console.log('Connected to mongodb at:', config.mongodb.uri);
 });
 
-// const server = https.createServer({}, app);
-app.listen(config.ports[0]);
+// const server = https.createServer({}, app); // If we wan't to listen for crypted https traffic, needs certificate
+app.listen(config.ports[0]); // Start listening for http requests on port
 console.log('Listening on ' + config.ports[0]);
 
-//Define template eninge
+//Define handlebars settings
 var hbs = exphbs.create({
-    defaultLayout: 'main',
+    defaultLayout: 'main', // Our main page layout, the border/wrapper/container, where the different pages will be inserted to
     partialsDir: [
-      __dirname+'/views/partials/'
-    ],
-    layoutsDir: __dirname+'/views/layouts/',
-    extname: "hbs",
+      __dirname+'/views/partials/' // Partials are html/handlebars pieces which can be inserted with {{> nameOnPartial}}. For example navbar is a partial
+    ], 
+    layoutsDir: __dirname+'/views/layouts/', // Where are the borders/wrappers/containers stored, the folder where main.hbs is
+    extname: "hbs", // Extensionname for the handlebars files
     helpers: {
+      // Helpers are javascript functions which can be called in handlebars files using for example {{json dataYouWantToStringify}}
       json: function (content) {
+        /* returns a stringified version of a json, useful when you want to show an object in html */
         return JSON.stringify(content);
       }
     }
@@ -35,14 +42,17 @@ var hbs = exphbs.create({
 
 // required for passport session
 app.use(session({
-    secret: config.secret,
-    saveUninitialized: true,
-    resave: true
+    secret: config.secret, // I think secret is used to encrypt the authentication cookie
+    saveUninitialized: true, // I think this is supposed to save user logins over server restarts
+    resave: true // same with this one, but it needs some more settings about where to save (mongoStore) or something like that
 }));
-app.engine('hbs', hbs.engine);
-app.use(express.json());
-app.set('view engine', 'hbs');
+app.engine('hbs', hbs.engine); // Sets handlebars as view engine
+app.set('view engine', 'hbs'); // Probably redundant because of line above
+app.use(express.json()); // Makes us to automatically parse incoming json as json
 app.use(express.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); // Makes the folder public open for all requests, so ip:port/public/stylesheets/style.css will get the style sheet
 
+// run the router with app as argument
+// Router is where http requests ar routed to their designated place
+// App is the express app which listens for requests on port
 require('./routes/router')(app);

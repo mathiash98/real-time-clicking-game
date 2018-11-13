@@ -44,44 +44,65 @@
         console.log(event);
     };
 
-function adminPagePostFormHandler(e, el) {
-    e.preventDefault();
-    let form = new FormData(el);
+function adminPageCityFormSubmit(evt, el) {
+    evt.preventDefault();
     console.log(el);
-    var xhr = new XMLHttpRequest();
-    xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === 4) {
-        console.log(this.responseText);
-        renderCityList(JSON.parse(this.responseText));
+    console.log(el.name);
+    let tmpcity = {
+        name: el.name.value,
+        level: el.level.value
     }
+    request('POST', 'crime', JSON.stringify(tmpcity), function(data){
+        console.log(data);
+        checkURL();
     });
+}
 
-    xhr.open("POST", el.action);
-    xhr.send(form);
+function adminPageCrimeFormSubmit(evt, el) {
+    evt.preventDefault();
+    console.log(el);
+    let tmpCrime = {
+        name: el.name.value,
+        level: el.level.value,
+        _city: el._city.value,
+        difficulty: el.difficulty.value,
+        maxPayout: el.maxPayout.value,
+        minPayout: el.minPayout.value
+    }
+    request('POST', 'city', JSON.stringify(tmpCrime), function(data){
+        console.log(data);
+        checkURL();
+    });
 }
 
 function checkURL() {
-    /*Gets the current url and checks if it contains some of the defined pages or whatever*/
+    /* Gets the current url and checks if it contains some of the defined pages
+       if the page is found, it will get the matching data from API and render the needed data */
     let url = '';
-    if (history.state == null) {
+
+    if (history.state == null) { // History date is null when user cam directly to this site etc ip:port/admin/city
         url = document.URL;
-    } else {
-        url = history.state.url;
+    } else { // However if user has used the back/forward button, the history state will change
+        url = history.state.url; 
     }
     console.log(url, url.indexOf('crime'));
+
+    // Checks if url contains string and gets data which passes data to render function
     if (url.indexOf('player') >= 0) {
-        getDataAndRunCB('player', renderPlayerList);
+        request('GET', 'player', '', renderPlayerList);
     } else if(url.indexOf('crime') >= 0){
-        getDataAndRunCB('crime', renderCrimeList);
+        request('GET', 'crime', '', renderCrimeList);
     } else if(url.indexOf('city') >= 0){
-        getDataAndRunCB('city', renderCityList);
+        request('GET', 'city', '', renderCityList);
     }
 }
 
 
 function renderCityList(cities) {
+    /* Render the city data plus a form for adding new data 
+       Considering to move stuff into a html template*/
     let tmpEl = `
-            <form action="/api/city" method="post" onsubmit="adminPagePostFormHandler(event, this)" id="adminPagePostForm">
+            <form action="/api/city" method="post" onsubmit="adminPageCityFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
                 <input type="text"
                     class="form-control" name="name" placeholder="Name">
@@ -112,8 +133,38 @@ function renderCityList(cities) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
+
+
 function renderCrimeList(crimes) {
+    /* Renders crime data and a form to add new crimes */
     let tmpEl = `
+            <form action="/api/crime" method="post" onsubmit="adminPageCrimeFormSubmit(event, this)" id="adminPagePostForm">
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                <input type="text"
+                    class="form-control" name="_city" placeholder="City">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="level" placeholder="Level">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="difficulty" placeholder="Difficulty">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="maxPayout" placeholder="Max payout">
+                </div>
+                <div class="form-group">
+                <input type="number"
+                    class="form-control" name="minPayout" placeholder="Min payout">
+                </div>
+                <button type="submit" class="btn btn-primary">Add crime</button>
+            </form>
             <table class="table">
                 <thead>
                     <tr>
@@ -143,6 +194,7 @@ function renderCrimeList(crimes) {
 }
 
 function renderPlayerList(users) {
+    /* Render players */
     let tmpEl = `
             <table class="table">
                 <thead>
@@ -168,7 +220,9 @@ function renderPlayerList(users) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
-function getDataAndRunCB(target, cb) {
+function request(method, target, data, cb) {
+    /*Sends a request to /api/:target with method, with data
+      The response is then parsed and sent as argument to cb function*/
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("readystatechange", function () {
     if (this.readyState === 4) {
@@ -177,7 +231,10 @@ function getDataAndRunCB(target, cb) {
     }
     });
 
-    xhr.open("GET", "/api/"+target);
-    xhr.send();
+    xhr.open(method, "/api/"+target);
+    if(data) {
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    }
+    xhr.send(data);
 }
 </script>
