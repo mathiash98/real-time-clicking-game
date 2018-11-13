@@ -64,6 +64,14 @@ app.get('/city', isLoggedIn, function (req, res) {
     });
 });
 
+app.get('/travel', isLoggedIn, function (req, res) {
+    City.find()
+    .sort({'difficulty': 1})
+    .exec(function (err, cities) {
+        res.render('travel', {'cities': cities});
+    });
+});
+
 app.get(['/admin', '/admin/:adminpage'], isAdmin, function (req, res) {
     res.render('admin');
 });

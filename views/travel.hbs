@@ -1,0 +1,49 @@
+<table id="travelTable" align="center">
+    <thead>
+        <th>Name</th>
+        <th>Level</th>
+
+    </thead>
+    <tbody>
+        {{#each cities}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.level}}</td>
+                <td><button type="button" class="btn btn-outline-secondary btn-sm" data-cityname="{{this.name}}">Travel</button></td>
+            </tr>
+        {{/each}}
+            
+    </tbody>
+</table> 
+
+<span id="responseBox"></span>
+
+<script>
+    let userObject = {{{json user}}};
+    document.getElementById("travelTable").addEventListener("click",function(e){
+        e.stopPropagation();
+        let cityname = e.target.dataset.cityname;
+        if(cityname) {
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.addEventListener("readystatechange", function () {
+                if(this.readyState === 4) {
+                    console.log(this);
+                    console.log(this.responseText);
+                    let res = JSON.parse(this.responseText);
+                    let responseBox = document.getElementById("responseBox");
+                    responseBox.innerHTML = res.msg;
+
+                    // update user info in navbar
+                    userObject._city = cityname;
+                    updateUserNavbar();
+                }
+            });
+
+            xhr.open("POST","/api/city/"+cityname+"/travel");
+            xhr.send();
+        }
+        });
+</script>
+

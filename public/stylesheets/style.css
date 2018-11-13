@@ -12,3 +12,7 @@ ul, li {
     list-style-type: none; 
     font-size: 1.5rem;
 }
+
+#adminPageDataTable td, th{
+    font-size: 1rem;
+}

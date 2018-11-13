@@ -114,7 +114,7 @@ function renderCityList(cities) {
                 </div>
                 <button type="submit" class="btn btn-primary">Post city</button>
             </form>
-            <table class="table">
+            <table class="table" id="adminPageDataTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -166,7 +166,7 @@ function renderCrimeList(crimes) {
                 </div>
                 <button type="submit" class="btn btn-primary">Add crime</button>
             </form>
-            <table class="table">
+            <table class="table" id="adminPageDataTable">
                 <thead>
                     <tr>
                         <th>Name</th>
@@ -197,7 +197,7 @@ function renderCrimeList(crimes) {
 function renderPlayerList(users) {
     /* Render players */
     let tmpEl = `
-            <table class="table">
+            <table class="table" id="adminPageDataTable">
                 <thead>
                     <tr>
                         <th>Name</th>

@@ -266,7 +266,7 @@ api.get('/city/:cityname', function (req, res) {
    }); 
 });
 
-api.get('/city/:cityname/travel', isLoggedInJson, function (req, res) {
+api.post('/city/:cityname/travel', isLoggedInJson, function (req, res) {
     // Need some mechanics to check if player is allowed to travel
     // Travel cooldown
     // Prison or not?
@@ -289,7 +289,7 @@ api.get('/city/:cityname/travel', isLoggedInJson, function (req, res) {
                 res.status(500).send(err);
             } else {
                 // Check if level is high enough
-                if (req.user.level > data.level) {
+                if (req.user.level >= data.level) {
                     // need to check if user has enough money to travel, but no checking atm
                     
                     // Updates user's _city and saves it

@@ -34,7 +34,7 @@ var hbs = exphbs.create({
     helpers: {
       // Helpers are javascript functions which can be called in handlebars files using for example {{json dataYouWantToStringify}}
       json: function (content) {
-        /* returns a stringified version of a json, useful when you want to show an object in html */
+        /* enables storage of objects in script inside html for example {{{json user}}} <- remember use 3 curly brackets first */
         return JSON.stringify(content);
       }
     }
