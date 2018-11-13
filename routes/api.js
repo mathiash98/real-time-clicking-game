@@ -7,6 +7,7 @@ const Item = require('../models/item');
 const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
+const Armour = require("../models/armour");
 
 function isLoggedInJson(req, res, next) {
     if(req.isAuthenticated()) {
@@ -201,6 +202,70 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
 
     });
 });
+
+// ==================================================================================
+// ===========================     ARMOUR API STUFF      ============================
+// ==================================================================================
+api.post("/armour", isAdminJson, function(req,res) {
+    console.log(req.body)
+    let newArmour = new Armour();
+    newArmour.name = req.body.name;
+    newArmour.price = req.body.price;
+    newArmour.defence = req.body.defence;
+    newArmour.level = req.body.level;
+    if(req.body.description) {
+        newArmour.description = req.body.description;
+    }
+    newArmour.save(function (err,data) {
+        if(err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            res.json(data);
+        }
+    });
+});
+
+api.post("/armour/:armourid/purchase", isLoggedInJson, function(req,res) {
+    Armour.findById(req.params.armourid)
+    .exec(function(err, armour) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            if (req.user.money < armour.price) {
+                res.json({
+                    "success": false,
+                    "msg": "You need to have a minimum of " + armour.price + " to buy this armour."
+                });
+            } else if (req.user.level < armour.level) {
+                res.json({
+                    "success":false,
+                    "msg": "You need to have a minimum level of " + armour.level + "to buy this armour"
+                });
+            } else {
+                req.user.money -= armour.price;
+                console.log(armour.id)
+                req.user._inventory._armours.push(armour);
+                req.user.save(function(err, data) {
+                    if (err) {
+                        console.log(err);
+                        res.status(500).send(err);
+
+                    } else {
+                        res.json({
+                            "success": true,
+                            "msg": "You have now bought " + armour.name + " !" 
+                        });
+                    }
+                });
+
+            }
+
+        }
+    });
+});
+
 
 
 // ==================================================================================

@@ -1,3 +1,5 @@
+
+<h2 align="center">Weapon Store</h2>
 <table id="weaponlist" align="center">
     <thead>
         <th>Name</th>
@@ -16,11 +18,9 @@
                 <td><button type="button" class="btn btn-outline-secondary btn-sm" data-weaponid="{{this._id}}">Buy</button></td>
             </tr>
         {{/each}}
-            
     </tbody>
-</table> 
 
-<span id="BuyResponseBox" syle="color: white;"></span>
+<span id="BuyResponseBox"></span>
 
 <script>
     document.getElementById("weaponlist").addEventListener("click",function(e){
@@ -42,4 +42,3 @@
         }
         });
 </script>
-

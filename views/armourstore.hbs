@@ -1,0 +1,45 @@
+<table id="armourlist" align="center">
+    <thead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Defence</th>
+        <th>Level</th>
+    </thead>
+    <tbody>
+        {{#each armours}}
+        <tr>
+            <td>{{this.name}}</td>
+            <td>{{this.price}}</td>
+            <td>{{this.defence}}</td>
+            <td>{{this.level}}</td>
+            <td><td><button type="button" class="btn btn-outline-secondary btn-sm" data-armourid="{{this._id}}">Buy</button></td></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<span id="BuyResponseArmour"></span>
+
+<script>
+    document.getElementById("armourlist").addEventListener("click",function(e) {
+        e.stopPropagation();
+        let armourid = e.target.dataset.armourid;
+        console.log(e)
+        console.log(armourid)
+        if(armourid) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.addEventListener("readystatechange",function() {
+                if(this.readyState === 4) {
+                    let res = JSON.parse(this.responseText);
+                    let BuyResponseArmour = document.getElementById("BuyResponseArmour");
+                    console.log(BuyResponseArmour)
+                    BuyResponseArmour.innerHTML = res.msg;
+                    console.log(res.msg)
+                }
+            });
+            xhr.open("POST","/api/armour/"+armourid+"/purchase");
+            xhr.send();
+        }
+    });
+</script>
