@@ -108,13 +108,19 @@ function adminPageCrimeFormSubmit(evt, el) {
 function adminPageWeaponFormSubmit(evt, el) {
     evt.preventDefault(); // Prevent traditional form action which reloads page
     console.log(el);
-    let tmpWeapon = {
+    let formdata = new FormData();
+    formdata.append('name', el.name.value);
+    formdata.append('price', el.price.value);
+    formdata.append('damage', el.damage.value);
+    formdata.append('level', el.level.value);
+    formdata.append('_image', el._image.files[0]);
+    {{!-- let tmpWeapon = {
         name: el.name.value,
         price: el.price.value,
         damage: el.damage.value,
         level: el.level.value
-    };
-    request('POST', 'weapon', JSON.stringify(tmpWeapon), function(data){
+    }; --}}
+    request('POST', 'weapon', formdata, function(data){
         console.log(data);
         checkURL();
     });
@@ -277,6 +283,10 @@ function renderWeaponList(weapons) {
                 <input type="number"
                     class="form-control" name="level" placeholder="Level">
                 </div>
+                <div class="form-group">
+                <input type="file"
+                    class="form-control" name="_image">
+                </div>
                 <button type="submit" class="btn btn-primary">Add weapon</button>
             </form>
             <table class="table" id="adminPageDataTable">
@@ -316,7 +326,12 @@ function request(method, target, data, cb) {
 
     xhr.open(method, "/api/"+target);
     if(data) {
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        console.log(data);
+        if(data._image){
+        }else {
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        }
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     }
     xhr.send(data);
 }

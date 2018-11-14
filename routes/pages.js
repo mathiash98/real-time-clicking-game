@@ -31,9 +31,7 @@ function isAdmin(req, res, next) {
 app.get('/', function (req, res) {
    res.render('index'); 
 });
-//app.get('/profile', isLoggedIn, function (req, res) {
-  //  res.render('profile'); 
-//});
+
 app.get('/crime', isLoggedIn, function (req, res) {
     Crime.find({'_city': req.user._city})
     .sort({'difficulty': 1})

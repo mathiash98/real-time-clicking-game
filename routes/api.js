@@ -1,4 +1,27 @@
 api = require('express').Router();
+const mongoose = require('mongoose');
+const mongodb = require('mongodb');
+const multer = require('multer');
+const conf = require('../config');
+
+// Some stuff used to get images from gridfs
+let db;
+mongodb.MongoClient.connect(conf.mongodb.uri, function(error, client) {
+  if (error) {
+      throw error;
+  }
+  db = client.db('mafia');
+});
+
+const fileStorage = require('multer-gridfs-storage') ({
+    url: conf.mongodb.uri
+});
+
+// Configure multer to pass files to fileStorage
+const upload = multer({ storage: fileStorage})
+// Multer upload file schemes
+// For single image upload on fieldname _image
+const sUpload = upload.single('_image');
 
 // Models
 var User = require('../models/user');
@@ -113,13 +136,18 @@ api.get("/weapon",function(req, res) {
     });
 });
 
-api.post("/weapon", isAdminJson ,function(req, res) {
+api.post("/weapon", isAdminJson, sUpload, function(req, res) {
     console.log(req.body)
     let newWeapon = new Weapon();
     newWeapon.price = req.body.price;
     newWeapon.damage = req.body.damage;
     newWeapon.name = req.body.name;
     newWeapon.level = req.body.level;
+    console.log(req.body);
+    console.log(req.file);
+    if (req.file) {
+        newWeapon._image = req.file;
+    }
     if(req.body.description){
         newWeapon.description = req.body.description;
     }
@@ -553,5 +581,31 @@ api.post("/organizedcrime/:organizedcrimeid/perform", isLoggedInJson, function(r
     })
 })
 
+
+// ==================================================================================
+// ===========================     Image API STUFF    ===============================
+// ==================================================================================
+
+api.get('/image/:imageid', function (req, res) {
+    console.log('looking for:', req.params.imageid);
+    const bucket = new mongodb.GridFSBucket(db, {});
+    bucket.openDownloadStream(new mongodb.ObjectID(req.params.imageid))
+        .on('error', function(error) {
+        assert.ifError(error);
+        console.log('error');
+        res.status(500).send(error);
+        })
+        .on('finish', function() {
+        console.log('done!');
+        process.exit(0);
+        })
+        .pipe(res);
+});
+
+api.post('/image', isAdminJson, sUpload, function (req, res) {
+    console.log(req.body);
+    console.log(req.file);
+    res.send('something');
+});
 
 module.exports = api;
