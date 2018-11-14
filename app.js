@@ -36,9 +36,38 @@ var hbs = exphbs.create({
       json: function (content) {
         /* enables storage of objects in script inside html for example {{{json user}}} <- remember use 3 curly brackets first */
         return JSON.stringify(content);
+      }, logHelper: function (v1, operator, v2, options) {
+        switch (operator) {
+          case '==':
+              return (v1 == v2) ? options.fn(this) : options.inverse(this);
+          case '===':
+              return (v1 === v2) ? options.fn(this) : options.inverse(this);
+          case '!=':
+              return (v1 != v2) ? options.fn(this) : options.inverse(this);
+          case '!==':
+              return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+          case '<':
+              return (v1 < v2) ? options.fn(this) : options.inverse(this);
+          case '<=':
+              return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+          case '>':
+              return (v1 > v2) ? options.fn(this) : options.inverse(this);
+          case '>=':
+              return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+          case '&&':
+              return (v1 && v2) ? options.fn(this) : options.inverse(this);
+          case '||':
+              return (v1 || v2) ? options.fn(this) : options.inverse(this);
+          default:
+              return options.inverse(this);
       }
+
+      }
+
     }
-});
+
+
+  });
 
 // required for passport session
 app.use(session({

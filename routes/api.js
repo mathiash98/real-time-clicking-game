@@ -7,6 +7,7 @@ const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
+const OrganizedCrime = require("../models/organizedcrime");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -491,7 +492,6 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                     req.user.xp += crime.experience;
                     console.log("User xp: ",req.user.xp)
                     console.log("experience",crime.experience)
-                    console.log("Xp to level",req.user.xp)
                     if(req.user.xp == req.user.xp_to_level) {
                         req.user.xp = 0;
                         req.user.xp_to_level += req.user.xp_to_level;
@@ -523,5 +523,35 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
         } 
     });
 });
+// ===========================  ==========================   ============================
+// ===========================  Organized Crime API STUFF   =============================
+// ===========================  ==========================   ============================
+api.post("/organizedcrime", isAdminJson, function (req, res) {
+    let newOrganizedCrime = new OrganizedCrime(req.body);
+
+    newOrganizedCrime.save(function(err,organizedcrime) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            console.log("New organized crime added.",organizedcrime.name);
+            res.json(organizedcrime);
+        }
+    })
+
+});
+
+api.post("/organizedcrime/:organizedcrimeid/perform", isLoggedInJson, function(req, res) {
+    OrganizedCrime.findOne({"_id": req.params.organizedcrimeid, "_city": req.user._city})
+    .exec(function (err, organizedcrime) {
+        if (err) {
+            console.log(err)
+            res.status(500).send(err);
+        } else {
+            //Add crime logic
+        }
+    })
+})
+
 
 module.exports = api;
