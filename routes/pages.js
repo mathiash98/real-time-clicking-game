@@ -6,7 +6,7 @@ const Weapon = require("../models/weapon");
 const City = require('../models/city');
 const User = require("../models/user");
 const Armor = require("../models/armor");
-const OrganizedCrime = require("../models/organizedcrime");
+// const OrganizedCrime = require("../models/organizedcrime");
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()){

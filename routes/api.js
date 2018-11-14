@@ -30,7 +30,7 @@ const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
-const OrganizedCrime = require("../models/organizedcrime");
+// const OrganizedCrime = require("../models/organizedcrime");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -131,7 +131,7 @@ api.get("/weapon",function(req, res) {
             console.log(err);
             res.status(500).send(err);        
         } else {
-            res.json(data)
+            res.json(data);
         }
     });
 });
@@ -143,10 +143,8 @@ api.post("/weapon", isAdminJson, sUpload, function(req, res) {
     newWeapon.damage = req.body.damage;
     newWeapon.name = req.body.name;
     newWeapon.level = req.body.level;
-    console.log(req.body);
-    console.log(req.file);
     if (req.file) {
-        newWeapon._image = req.file;
+        newWeapon._image._id = req.file.id;
     }
     if(req.body.description){
         newWeapon.description = req.body.description;
@@ -156,7 +154,7 @@ api.post("/weapon", isAdminJson, sUpload, function(req, res) {
         console.log(err)
         res.status(500).send(err);
     } else {
-        res.json(data)
+        res.json(data);
     }
     });
 });
@@ -587,6 +585,7 @@ api.post("/organizedcrime/:organizedcrimeid/perform", isLoggedInJson, function(r
 // ==================================================================================
 
 api.get('/image/:imageid', function (req, res) {
+    /* API for getting images */
     console.log('looking for:', req.params.imageid);
     const bucket = new mongodb.GridFSBucket(db, {});
     bucket.openDownloadStream(new mongodb.ObjectID(req.params.imageid))
@@ -603,9 +602,10 @@ api.get('/image/:imageid', function (req, res) {
 });
 
 api.post('/image', isAdminJson, sUpload, function (req, res) {
+    /* General image posting API */
     console.log(req.body);
     console.log(req.file);
-    res.send('something');
+    res.send(req.file);
 });
 
 module.exports = api;

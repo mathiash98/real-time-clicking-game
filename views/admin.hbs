@@ -15,8 +15,6 @@
     </div>
 </div>
 
-
-
 <script>
 let adminPageContainer = document.getElementById('adminPageContainer');
 let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
@@ -306,6 +304,7 @@ function renderWeaponList(weapons) {
                         <td>${weapon.damage}</td>
                         <td>${weapon.level}</td>
                         <td>${weapon.active}</td>
+                        <td><img style="max-height:100px;" src="/api/image/${weapon._image._id}"></td>
                     </tr>`)}
                 </tbody>
             </table>
@@ -318,7 +317,7 @@ function request(method, target, data, cb) {
       The response is then parsed and sent as argument to cb function*/
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === 4) {
+    if (this.readyState === 4) { // readystate = complete with request
         console.log(this.responseText);
         cb(JSON.parse(this.responseText));
     }
@@ -326,12 +325,10 @@ function request(method, target, data, cb) {
 
     xhr.open(method, "/api/"+target);
     if(data) {
-        console.log(data);
-        if(data._image){
+        if(data instanceof FormData){ // check if data is a formdata which is needed for file uploads
         }else {
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); // if not formdata, we need to specify content-type
         }
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     }
     xhr.send(data);
 }
