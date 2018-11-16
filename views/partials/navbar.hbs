@@ -17,24 +17,29 @@
                 <a class="nav-link" href="/organizedcrime">Organized Crime</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/weaponstore">Weapon Store</a>
+                <a class="nav-link" href="/store">Store</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/travel">Travel</a>
             </li>
             
+            {{!-- Check if user is admin --}}
             {{#if user.admin}}
-            <li class="nav-item">
-                <a class="nav-link" href="/admin">Admin</a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Admin</a>
+                </li>
             {{/if}}
-            <li class="nav-item">
-                <a class="nav-link" href="/auth/logout">Log out</a>
-            </li>
-            {{else}}
-            <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/register">Register</a>
-            </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/auth/logout">Log out</a>
+                </li>
+            {{else}} 
+                {{!-- If user isn't logged in --}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/register">Register</a>
+                </li>
             {{/if}}
         </ul>
         <span id="nav-user">

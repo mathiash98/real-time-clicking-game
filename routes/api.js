@@ -30,6 +30,7 @@ const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
+const Car = require('../models/car');
 // const OrganizedCrime = require("../models/organizedcrime");
 
 function isLoggedInJson(req, res, next) {
@@ -211,7 +212,7 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
 });
 
 // ==================================================================================
-// ===========================     ARMOR API STUFF      ============================
+// ===========================     ARMOR API STUFF      =============================
 // ==================================================================================
 api.post("/armor", isAdminJson, function(req,res) {
     console.log(req.body)
@@ -273,8 +274,73 @@ api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
     });
 });
 
+// ==================================================================================
+// ===========================     CAR API STUFF      ===============================
+// ==================================================================================
+api.get('/car', function (req, res) {
+   Car.find()
+   .sort({level: 1})
+   .exec(function (err, cars) {
+      if (err) {
+          res.status(500).send(err);
+      } else {
+          res.send(cars);
+      } 
+   });
+});
 
+api.post('/car', isAdminJson, sUpload, function (req, res) {
+   let tmpCar = new Car(req.body);
+   if (req.file) {
+        tmpCar._image._id = req.file.id;
+    }
+   tmpCar.save(function (err, car) {
+    if (err) {
+        res.status(500).send(err);
+    } else {
+        res.send(car);
+    } 
+   });
+});
 
+api.get('/car/:carid', function (req, res) {
+   Car.findById(req.params.carid, function (err, car) {
+    if (err) {
+        res.status(500).send(err);
+    } else {
+        res.send(car);
+    } 
+   });
+});
+
+api.post('/car/:carid/purchase', isLoggedInJson, function (req, res) {
+    Car.findById(req.params.carid, function (err, car) {
+     if (err) {
+         res.status(500).send(err);
+     } else {
+         if (car.price > req.user.money) {
+             res.json({
+                 success: false,
+                 msg: 'You need ' + car.price + ' money to buy this car. Go do some crime!'
+             });
+         } else {
+             req.user.money -= car.price;
+             req.user._inventory.cars.push(car);
+             req.user.save(function (err, data) {
+                if (err) {
+                    res.status(500).send(err);
+                } else {
+                    res.json({
+                        success: true,
+                        msg: 'You bought ' + car.name,
+                        price: car.price
+                    });
+                } 
+             });
+         }
+     } 
+    });
+ });
 // ==================================================================================
 // ===========================     CATEGORY API STUFF    ============================
 // ==================================================================================

@@ -19,6 +19,9 @@
     background-color: #6c757d;
 }
 
+#carlist img {
+    max-width: 100px;
+}
 
 .weapandarm tr:nth-child(even) {
     background-color: #f2f2f2;

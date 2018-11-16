@@ -6,6 +6,7 @@ const Weapon = require("../models/weapon");
 const City = require('../models/city');
 const User = require("../models/user");
 const Armor = require("../models/armor");
+const Car = require("../models/car");
 // const OrganizedCrime = require("../models/organizedcrime");
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
@@ -48,10 +49,12 @@ app.get("/organizedcrime",isLoggedIn, function (req, res) {
     });
 });
 
-app.get("/weaponstore",isLoggedIn, function (req, res) {
-    Weapon.find(function (err,weapons) {
+app.get("/store",isLoggedIn, function (req, res) {
+    Weapon.find(function (err, weapons) {
         Armor.find(function (err, armors) {
-            res.render("weaponstore",{"weapons": weapons, "armors": armors});
+            Car.find(function (err, cars) {
+                res.render("store", {"weapons": weapons, "armors": armors, 'cars': cars});
+            });
         });
     }); 
 });

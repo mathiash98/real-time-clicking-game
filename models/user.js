@@ -57,11 +57,17 @@ var userSchema = new mongoose.Schema({
       _city: {type: String, default: "Bergen"},
       _inventory: {
         _weapons: [{
-          _id: Number,
-          name:{type: String},
-          price:{type: Number, default: 0},
-          damage:{type: Number, default: 0},
-          level:{type: Number, default: 0}
+          name: {type: String},
+          price: {type: Number,default: 0},
+          damage: {type: Number,default: 0},
+          level: {type: Number, default: 0},
+          active: {type: Boolean, default: true},
+          _image: {
+              _id: {
+                  type:mongoose.Schema.Types.ObjectId,
+                  ref: 'fs.files'
+                }
+          }
         }],
         _armors: [{
           _id: Number,
@@ -71,7 +77,21 @@ var userSchema = new mongoose.Schema({
           level:{type: Number, default: 0}
         }],
         cars: [{
-
+          name: {type: String, requires: true},
+          price: {type: Number, required: true},
+          defence: {type: Number, required: true},
+          _city: {type: String, required: true},
+          speed: {type: Number, default: 60},
+          seats: {type: Number, default: 5},
+          cargo: {type: Number, default: 10},
+          level: {type: Number, default: 0},
+          active: {type: Boolean, default: true},
+          _image: {
+              _id: {
+                  type:mongoose.Schema.Types.ObjectId,
+                  ref: 'fs.files'
+                }
+          }
         }]
       },
       _equipped: [{
