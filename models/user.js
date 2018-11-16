@@ -37,7 +37,7 @@ var userSchema = new mongoose.Schema({
 
       level: {
         type: Number,
-        default: 0
+        default: 1
       },
       attackPoints: {type: Number, default: 0},
       defencePoints: {type: Number, default: 0},
@@ -59,15 +59,15 @@ var userSchema = new mongoose.Schema({
         _weapons: [{
           _id: Number,
           name:{type: String},
-          price:{type: Number,default: 0},
-          damage:{type: Number,default: 0},
+          price:{type: Number, default: 0},
+          damage:{type: Number, default: 0},
           level:{type: Number, default: 0}
         }],
         _armors: [{
           _id: Number,
           name:{type: String},
-          price:{type: Number,default: 0},
-          defence:{type: Number,default: 0},
+          price:{type: Number, default: 0},
+          defence:{type: Number, default: 0},
           level:{type: Number, default: 0}
         }],
         cars: [{
@@ -76,7 +76,14 @@ var userSchema = new mongoose.Schema({
       },
       _equipped: [{
         type: Number,
-        ref: 'Item' }],
+        ref: 'Item'
+      }],
+      cooldown: {type: Map, of: mongoose.Mixed, default: new Map()},
+      // cooldown: [{
+      //   _id: {type: Number},
+      //   started: {type: Date},
+      //   end: {type: Date}
+      // }],
       active: {type: Boolean, default: true},
       added: { type: Date, default: Date.now },
       edited: { type: Date, default: Date.now }

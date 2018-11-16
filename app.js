@@ -36,9 +36,51 @@ var hbs = exphbs.create({
       json: function (content) {
         /* enables storage of objects in script inside html for example {{{json user}}} <- remember use 3 curly brackets first */
         return JSON.stringify(content);
-      }
+      }, // json
+      logHelper: function (v1, operator, v2, options) {
+        switch (operator) {
+          case '==':
+              return (v1 == v2) ? options.fn(this) : options.inverse(this);
+          case '===':
+              return (v1 === v2) ? options.fn(this) : options.inverse(this);
+          case '!=':
+              return (v1 != v2) ? options.fn(this) : options.inverse(this);
+          case '!==':
+              return (v1 !== v2) ? options.fn(this) : options.inverse(this);
+          case '<':
+              return (v1 < v2) ? options.fn(this) : options.inverse(this);
+          case '<=':
+              return (v1 <= v2) ? options.fn(this) : options.inverse(this);
+          case '>':
+              return (v1 > v2) ? options.fn(this) : options.inverse(this);
+          case '>=':
+              return (v1 >= v2) ? options.fn(this) : options.inverse(this);
+          case '&&':
+              return (v1 && v2) ? options.fn(this) : options.inverse(this);
+          case '||':
+              return (v1 || v2) ? options.fn(this) : options.inverse(this);
+          default:
+              return options.inverse(this);
+        }
+
+      }, // logHelper
+      calcPercentageSuccess: function (userLevel, crime) {
+            /* need to move this function somewhere else, currently this is a copy of the function in api/crime */
+            let crimeDiff = crime.difficulty;
+            let minPercentage = 0.3; // needs to be calculated based on level
+            let maxPercentage = 0.9;
+            let c = maxPercentage - minPercentage;
+            let k = 0.68;
+            let b = Math.E ** (-k);
+
+            let probability = (minPercentage + ( c/(1 + crimeDiff*b**userLevel) ));
+            // console.log('Probability is: ' + probability + ' for ' + crime.name + ' with user '+req.user.username+' on level: ' + userLevel);
+            return Math.floor(100*probability);
+        }
     }
-});
+
+
+  });
 
 // required for passport session
 app.use(session({

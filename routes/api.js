@@ -30,6 +30,7 @@ const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
+// const OrganizedCrime = require("../models/organizedcrime");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -130,7 +131,7 @@ api.get("/weapon",function(req, res) {
             console.log(err);
             res.status(500).send(err);        
         } else {
-            res.json(data)
+            res.json(data);
         }
     });
 });
@@ -142,10 +143,8 @@ api.post("/weapon", isAdminJson, sUpload, function(req, res) {
     newWeapon.damage = req.body.damage;
     newWeapon.name = req.body.name;
     newWeapon.level = req.body.level;
-    console.log(req.body);
-    console.log(req.file);
     if (req.file) {
-        newWeapon._image = req.file;
+        newWeapon._image._id = req.file.id;
     }
     if(req.body.description){
         newWeapon.description = req.body.description;
@@ -155,7 +154,7 @@ api.post("/weapon", isAdminJson, sUpload, function(req, res) {
         console.log(err)
         res.status(500).send(err);
     } else {
-        res.json(data)
+        res.json(data);
     }
     });
 });
@@ -457,11 +456,9 @@ api.get('/crime', isLoggedInJson, function (req, res) {
 });
 
 api.post('/crime', isAdminJson, function (req, res) {
+    console.log('body:', req.body);
    let newCrime = new Crime(req.body);
-   newCrime.msgFalse = req.body.msgFalse;
-   newCrime.msgSuccess = req.body.msgSuccess;
-   newCrime.experience = req.body.experience;
-   
+   console.log('newCrime:', newCrime);
    newCrime.save(function (err, crime) {
     if (err) {
         console.log(err);
@@ -491,6 +488,7 @@ api.get(['/crime/:crimeid', '/crime/:crimeid/:crimename'], isLoggedInJson, funct
     });
 });
 
+
 api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
     /* Performs a crime based on id */
     Crime.findOne({'_id': req.params.crimeid, '_city': req.user._city})
@@ -500,63 +498,157 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
             res.status(500).send(err);
         } else {
             if (req.user.level < crime.level) { //Check if plaer's level is high enough
-                res.status(400).json({
-                    'success': false,
-                    msg: 'You need to be level: ' + crime.level + ' to perform this crime!'
-                });
+            res.status(400).json({
+                'success': false,
+                msg: 'You need to be level: ' + crime.level + ' to perform this crime!'
+            });
             } else {
-
-                //Add experience to the player, based on difficulty of crime.
-
-                
-                // Do some algorith stuff to calculate if you succed
-                // Make some stupid random calc based on difficulty and check if crime is succeded
-                if (getRandomInt(req.user.level, crime.difficulty) > 6) {
-                    // Makes a random payout inbetween min and max
-                    let payout = getRandomInt(crime.minPayout, crime.maxPayout);
-                    // Updates the user with money
-                    req.user.money += payout;
-                    req.user.xp += crime.experience;
-                    console.log("User xp: ",req.user.xp)
-                    console.log("experience",crime.experience)
-                    console.log("Xp to level",req.user.xp)
-                    if(req.user.xp == req.user.xp_to_level) {
-                        req.user.xp = 0;
-                        req.user.xp_to_level += req.user.xp_to_level;
-                        req.user.level += 1;
+                console.log('Level is high enough');
+                let timenow = Date.now();
+                function checkCoolDown() {
+                    /* Calculate if timenow is greater than end of cooldown */
+                    let cooldownObject = req.user.cooldown.get(crime._id.toString());
+                    if (cooldownObject != null) { // check if crim._id is found in req.user.cooldown map
+                        let delta = cooldownObject.end - timenow;  // time difference in milliseconds
+                        if (delta > 0) {
+                            return delta;
+                        } else {
+                            // req.user.cooldown.delete(crime._id.toString()); // hmm should we delete it or just keep it?
+                            return false;
+                        }
                     }
+                    return false
+                };
+                let cooldown = checkCoolDown();
+                if (cooldown){
+                    res.json({
+                        success: false,
+                        msg: 'Wait ' + Math.floor(cooldown/1000) + ' seconds.'
+                    });
+                } else {
+                    let responseJSON = {}; // the object which will eventually be sent back to client
                     
+                    // Do some algorith stuff to calculate if you succed
+                    // Make some stupid random calc based on difficulty and check if crime is succeded
+                    // Calculate percetage of success based on req.user.experience and crime.difficulty
+                    // Get percentage a function which goes to max 90%
+                    // then check if getRandomInt(0, 100) < percentage
+                    function calcPercentageSuccess(user, crime) {
+                        /* Calculate probability for success based on user against difficulty 
+                            https://www.desmos.com/calculator/agxuc5gip8 <-- Use this to make some pretty graph
+                            g\left(x\right)=d+\frac{c}{1+ab^x} <-- paste this to have same graph thing
+                            https://gamedev.stackexchange.com/questions/14309/how-to-develop-rpg-damage-formulas?newreg=68ca388cd9ee4957a59ca119ff68b4e8
+                            ^^ used this question as help
+                        */
+                        let userLevel = user.level;
+                        let crimeDiff = crime.difficulty;
+                        let minPercentage = 0.3; // needs to be calculated based on level
+                        let maxPercentage = 0.9;
+                        let c = maxPercentage - minPercentage;
+                        let k = 0.68;
+                        let b = Math.E ** (-k);
+
+                        let probability = (minPercentage + ( c/(1 + crimeDiff*b**userLevel) ));
+                        // console.log('Probability is: ' + probability + ' for ' + crime.name + ' with user '+req.user.username+' on level: ' + userLevel);
+                        return 100*probability;
+
+                        // Maybe add som personality stats here as well
+                        // Like intelligence, etc
+                        // Crimes might need some properties like defence
+                        // surveillance boolean, so you need good intelligence or whatever
+                        // Stafflevel etc
+                        // Busy or not, crowded=less likelyhood
+
+                    }
+
+                    if (getRandomInt(0,100) < calcPercentageSuccess(req.user, crime)) {
+                        // Makes a random payout inbetween min and max
+                        let payout = getRandomInt(crime.minPayout, crime.maxPayout);
+                        // Updates the user with money
+                        req.user.money += payout;
+                        //Add experience to the player, based on crime.experience
+                        req.user.xp += crime.experience;
+                        if(req.user.xp == req.user.xp_to_level) {
+                            req.user.xp = 0;
+                            req.user.xp_to_level += req.user.xp_to_level;
+                            req.user.level += 1;
+                        }
+                        
+                        // find a random message based on msgSuccess array
+                        let tmpMsg = crime.msgSuccess[getRandomInt(0, crime.msgSuccess.length-1)];
+                        responseJSON = {
+                            success: true,
+                            msg: tmpMsg, 
+                            reward: payout,
+                            experience: crime.experience
+                        };
+                    } else {
+                        // Need some algorith to check if user goes to jail
+                        
+                        // find a random message based on msgFalse array
+                        let tmpMsg = crime.msgFalse[getRandomInt(0, crime.msgFalse.length-1)];
+                        responseJSON = {
+                            success: false,
+                            msg: tmpMsg
+                        };
+                    } // ifelse success
+                    
+                    // Set cooldown
+                    let cooldownEnd = timenow + (crime.cooldown*1000);
+                    req.user.cooldown.set(crime._id.toString(), {start: timenow, end: cooldownEnd});
+                    responseJSON.cooldownEnd = cooldownEnd;
+                    // all the logic is now done, will now update the user and then return message to client
                     // Saves the updated user
                     req.user.save(function (err, updatedUser) {
                        if(err) {
+                           console.log(err);
                            res.status(500).send(err);
-                       } else {
-                            // Return an appropiate message
-                            // etc: you stole a fresh piece of meat and sold it to a hobo for payout 
-                           res.json({
-                               success: true,
-                               msg: crime.msgSuccess + "You have stolen " + payout + " and recieved a total of " + crime.experience, 
-                               reward: payout
-                           })
+                       } else {   
+                           res.json(responseJSON); // Return the response object back to user
                        }
                     });
-                } else {
-                    // Need some algorith to check if user goes to jail
-                    res.json({
-                        success: false,
-                        msg: crime.msgFalse
-                    });
-                }
-            }
-        } 
+                } // ifelse cooldown
+            } // ifelse level
+        } // ifelse err 
     });
 });
+// ===========================  ==========================   ============================
+// ===========================  Organized Crime API STUFF   =============================
+// ===========================  ==========================   ============================
+api.post("/organizedcrime", isAdminJson, function (req, res) {
+    let newOrganizedCrime = new OrganizedCrime(req.body);
+
+    newOrganizedCrime.save(function(err,organizedcrime) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            console.log("New organized crime added.",organizedcrime.name);
+            res.json(organizedcrime);
+        }
+    })
+
+});
+
+api.post("/organizedcrime/:organizedcrimeid/perform", isLoggedInJson, function(req, res) {
+    OrganizedCrime.findOne({"_id": req.params.organizedcrimeid, "_city": req.user._city})
+    .exec(function (err, organizedcrime) {
+        if (err) {
+            console.log(err)
+            res.status(500).send(err);
+        } else {
+            //Add crime logic
+        }
+    })
+})
+
 
 // ==================================================================================
 // ===========================     Image API STUFF    ===============================
 // ==================================================================================
 
 api.get('/image/:imageid', function (req, res) {
+    /* API for getting images */
     console.log('looking for:', req.params.imageid);
     const bucket = new mongodb.GridFSBucket(db, {});
     bucket.openDownloadStream(new mongodb.ObjectID(req.params.imageid))
@@ -573,9 +665,10 @@ api.get('/image/:imageid', function (req, res) {
 });
 
 api.post('/image', isAdminJson, sUpload, function (req, res) {
+    /* General image posting API */
     console.log(req.body);
     console.log(req.file);
-    res.send('something');
+    res.send(req.file);
 });
 
 module.exports = api;

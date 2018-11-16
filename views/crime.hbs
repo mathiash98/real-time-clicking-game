@@ -1,6 +1,6 @@
 <div class="list-group" id="crimelist">
     {{#each crimes}}
-        <button type="button" class="list-group-item list-group-item-action" data-crimeid="{{this._id}}">{{this.name}} - difficulty: {{this.difficulty}} - required level: {{this.level}}</button>
+        <button type="button" class="list-group-item list-group-item-action" data-crimeid="{{this._id}}">{{this.name}} - Probability: {{#calcPercentageSuccess ../user.level this}}{{/calcPercentageSuccess}}% - required level: {{this.level}} <span class="crimelist-cooldown"></span></span></button>
     {{/each}}
 </div>
 
@@ -8,33 +8,72 @@
 
 
 <script>
+let crimelistButtons = document.getElementById('crimelist').children;
+let crimeResponseBox = document.getElementById('crimeResponseBox');
+
+setInterval(renderCooldownTime, 1000); // run renderCoolDownTime every 1000 millisecond
+
+
 document.getElementById('crimelist').addEventListener('click', function(e){
-    e.stopPropagation();
+    /* Listens for click on crimelist element */ 
+    handleCrimelistClick(e);
+});
+
+function handleCrimelistClick(e) {
+    e.stopPropagation(); // used to reduce cpu usage
     let crimeid = e.target.dataset.crimeid;
-    console.log(e)
 
     var xhr = new XMLHttpRequest();
 
-//Når xhr blir sendt, så begynner denne her å lytte. Hvis readystate er lik 4. Når den er ferdig konverteres 
+    // When xhr has been sent, this wil listen for changes in readystate
+    // readystate 4 = request is complete
     xhr.addEventListener("readystatechange", function () { 
     if (this.readyState === 4) {
-        let res  = JSON.parse(this.responseText);
-        let crimeResponseBox = document.getElementById('crimeResponseBox');
-        crimeResponseBox.innerHTML = res.msg;
-        if(res.success){
+        let res  = JSON.parse(this.responseText); // parse the incoming message
+        
+        if(res.success){ // crime succeded
             crimeResponseBox.style.backgroundColor = 'green';
-
             // update user info in navbar
             userObject.money += res.reward;
+            crimeResponseBox.innerHTML = res.msg + ' +' + res.reward + ' money and +' + res.experience + ' xp.'; // Display the msg in the crimeResponseBox element
             updateUserNavbar();
-        }else {
+        } else {
+            crimeResponseBox.innerHTML = res.msg; // Display the msg in the crimeResponseBox element
             crimeResponseBox.style.backgroundColor = 'red';
         }
-
+        // update the userObject with the new cooldown
+        userObject.cooldown[crimeid] = {end: res.cooldownEnd};
+        renderCooldownTime();
     }
     });
 
-    xhr.open("POST", "/api/crime/"+crimeid+"/perform"); //Definerer om det skal være get, post , delete osv og hvor den skal sendes til for eks. /api/crime
-    xhr.send(); 
-});
+    xhr.open("POST", "/api/crime/"+crimeid+"/perform"); // Define method (GET, POST etc), to what API endpoint
+    xhr.send(); // send xhr request
+}
+
+function renderCooldownTime() {
+    /* Goes through all crimebuttons, gets id and check if it has cooldown with userObject, then render cooldown time */
+    let timenow = Date.now(); // Timestamp now
+    for (var i = 0; i<crimelistButtons.length; i++) {
+        // Has to check if userObject.cooldown contains the crime
+        let cooldownProp = userObject.cooldown[crimelistButtons[i].dataset.crimeid];
+        if (cooldownProp){
+            let delta = cooldownProp.end - timenow; //  time difference
+            if (delta > 0) { // cooldown remainign
+                crimelistButtons[i].children[0].innerHTML = '- ' + Math.floor(delta/1000) + ' seconds cooldown.'; // display cooldown time to the span
+                crimelistButtons[i].setAttribute('disabled', true); // makes the button unpressable
+                if (!crimelistButtons[i].classList.contains('disabled')) { // check if it already has class disabled
+                    crimelistButtons[i].classList.add('disabled'); // add disabled from classlist
+                }
+            } else {
+                crimelistButtons[i].children[0].innerHTML = ''; // remove cooldown time
+                crimelistButtons[i].removeAttribute('disabled'); // reactivates button
+                if (crimelistButtons[i].classList.contains('disabled')) { // check if it already has class disabled
+                    crimelistButtons[i].classList.remove('disabled'); // remove disabled from classlist
+                }
+            }
+
+        }
+    }
+}
 </script>   

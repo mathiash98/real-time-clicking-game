@@ -15,8 +15,6 @@
     </div>
 </div>
 
-
-
 <script>
 let adminPageContainer = document.getElementById('adminPageContainer');
 let lastActiveNavListEl = document.getElementById('adminPageNavList').children[0];
@@ -95,10 +93,12 @@ function adminPageCrimeFormSubmit(evt, el) {
         difficulty: el.difficulty.value,
         maxPayout: el.maxPayout.value,
         minPayout: el.minPayout.value,
-        msgSuccess: el.msgSuccess.value,
-        msgFalse: el.msgFalse.value,
-        experience: el.experience.value
+        msgSuccess: el.msgSuccess.value.split('\n'),
+        msgFalse: el.msgFalse.value.split('\n'),
+        experience: el.experience.value,
+        cooldown: el.cooldown.value
     };
+    console.log('formdata', tmpCrime);
     request('POST', 'crime', JSON.stringify(tmpCrime), function(data){
         console.log(data);
         checkURL();
@@ -166,42 +166,38 @@ function renderCityList(cities) {
 function renderCrimeList(crimes) {
     /* Renders crime data and a form to add new crimes */
     let tmpEl = `
-            <form action="/api/crime" method="post" onsubmit="adminPageCrimeFormSubmit(event, this)" id="adminPagePostForm">
+            <form action="/api/crime" method="post" class="form-horizontal" onsubmit="adminPageCrimeFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
-                <input type="text"
-                    class="form-control" name="name" placeholder="Name" value="Ran">
+                <input type="text" class="form-control" name="name" placeholder="Name" value="Ran">
                 </div>
                 <div class="form-group">
-                <input type="text"
-                    class="form-control" name="_city" placeholder="City" value="Bergen">
+                <input type="text" class="form-control" name="_city" placeholder="City" value="Bergen">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="level" placeholder="Level" value="0">
+                <input type="number" class="form-control" name="level" placeholder="Level" value="0">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="difficulty" placeholder="Difficulty" value="10">
+                <input type="number" class="form-control" name="difficulty" placeholder="Difficulty" value="10">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="maxPayout" placeholder="Max payout" value="999">
+                <input type="number" class="form-control" name="maxPayout" placeholder="Max payout" value="999">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="minPayout" placeholder="Min payout" value="1">
+                <input type="number" class="form-control" name="minPayout" placeholder="Min payout" value="1">
                 </div>
                 <div class="form-group">
-                <input type="text"
-                    class="form-control" name="msgSuccess" placeholder="Successmessage" value="Success">
+                    <label>Success mesages: One message per line</label>
+                    <textarea class="form-control" id="formSuccess" name="msgSuccess"rows="5">You are a beast\nYou the best</textarea>
                 </div>
                 <div class="form-group">
-                <input type="text"
-                    class="form-control" name="msgFalse" placeholder="Failmessage" value="Fail brooo">
+                    <label>Failure mesages: One message per line</label>
+                    <textarea class="form-control" name="msgFalse"rows="5"></textarea>
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="experience" placeholder="Experience" value="10">
+                    <input type="number" class="form-control" name="experience" placeholder="Experience" value="10">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="cooldown" placeholder="Cooldown in seconds" value="10">
                 </div>
                 </div>
                 <button type="submit" class="btn btn-primary">Add crime</button>
@@ -268,24 +264,19 @@ function renderWeaponList(weapons) {
     let tmpEl = `
             <form action="/api/weapon" method="post" onsubmit="adminPageWeaponFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
-                <input type="text"
-                    class="form-control" name="name" placeholder="Name">
+                    <input type="text" class="form-control" name="name" placeholder="Name">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="price" placeholder="Price">
+                    <input type="number" class="form-control" name="price" placeholder="Price">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="damage" placeholder="Damage">
+                    <input type="number" class="form-control" name="damage" placeholder="Damage">
                 </div>
                 <div class="form-group">
-                <input type="number"
-                    class="form-control" name="level" placeholder="Level">
+                    <input type="number" class="form-control" name="level" placeholder="Level">
                 </div>
                 <div class="form-group">
-                <input type="file"
-                    class="form-control" name="_image">
+                    <input type="file"class="form-control-file" name="_image">
                 </div>
                 <button type="submit" class="btn btn-primary">Add weapon</button>
             </form>
@@ -306,6 +297,7 @@ function renderWeaponList(weapons) {
                         <td>${weapon.damage}</td>
                         <td>${weapon.level}</td>
                         <td>${weapon.active}</td>
+                        <td><img style="max-height:100px;" src="/api/image/${weapon._image._id}"></td>
                     </tr>`)}
                 </tbody>
             </table>
@@ -316,9 +308,10 @@ function renderWeaponList(weapons) {
 function request(method, target, data, cb) {
     /*Sends a request to /api/:target with method, with data
       The response is then parsed and sent as argument to cb function*/
+      console.log('data in request method', data);
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("readystatechange", function () {
-    if (this.readyState === 4) {
+    if (this.readyState === 4) { // readystate = complete with request
         console.log(this.responseText);
         cb(JSON.parse(this.responseText));
     }
@@ -326,12 +319,10 @@ function request(method, target, data, cb) {
 
     xhr.open(method, "/api/"+target);
     if(data) {
-        console.log(data);
-        if(data._image){
+        if(data instanceof FormData){ // check if data is a formdata which is needed for file uploads
         }else {
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8"); // if not formdata, we need to specify content-type
         }
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
     }
     xhr.send(data);
 }

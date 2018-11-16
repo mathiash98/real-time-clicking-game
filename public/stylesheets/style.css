@@ -1,5 +1,3 @@
-
-
 .profile li {
     padding: 10px;
     margin: 10px;
@@ -31,4 +29,13 @@
     padding-left: .5rem;
     display: inline-block;
     font-size: 1rem;
+}
+
+/* Crimelist */
+#crimelist button {
+    color: #f3f3f3;
+    background-color: #6c757d;
+}
+#crimelist .disabled {
+    color: #bdbdbd;
 }

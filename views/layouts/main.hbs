@@ -7,8 +7,11 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <script>
-    let userObject = {{{json user}}};
-    
+    {{#if user}}
+      let userObject = {{{json user}}};
+    {{else}}
+      let userObject = {};
+    {{/if}}
     function updateUserNavbar(){
       document.getElementById("nav-city").innerHTML = userObject._city;
       document.getElementById("nav-money").innerHTML = userObject.money;
