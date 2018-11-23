@@ -2,7 +2,6 @@ console.log("Hello from car.js")
 var mongoose = require("mongoose")
 
 // Models
-const Image = require('./image');
 
 var carSchema = new mongoose.Schema({
     name: {type: String, requires: true},

@@ -1,12 +1,18 @@
 console.log("Hello from armor.js")
 var mongoose = require("mongoose")
-const autoinc = require('mongoose-plugin-autoinc').autoIncrement;
 
 var armorSchema = new mongoose.Schema({
-    name:{type: String},
-    price:{type: Number,default: 0},
-    defence:{type: Number,default: 0},
-    level:{type: Number, default: 0}
+    name: {type: String, unique: true},
+    price: {type: Number, default: 0},
+    defence: {type: Number, default: 0},
+    level: {type: Number, default: 0},
+    _image: {
+        _id: {
+            type:mongoose.Schema.Types.ObjectId,
+            ref: 'fs.files'
+          }
+    },
+    active: {type: Boolean, default: true}
 });
 
 armorSchema.pre("save", function(next) {
@@ -14,5 +20,4 @@ armorSchema.pre("save", function(next) {
     return next();
 });
 
-armorSchema.plugin(autoinc, 'Armor');
 module.exports = mongoose.model("Armor",armorSchema);

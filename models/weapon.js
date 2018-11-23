@@ -1,9 +1,7 @@
 console.log("Hello from weapon.js")
 var mongoose = require("mongoose")
-const autoinc = require('mongoose-plugin-autoinc').autoIncrement;
 
 // Models
-const Image = require('./image');
 
 var weaponSchema = new mongoose.Schema({
     name: {type: String},
@@ -24,5 +22,4 @@ weaponSchema.pre("save", function(next) {
     return next();
 });
 
-weaponSchema.plugin(autoinc, 'Weapon');
 module.exports = mongoose.model("Weapon",weaponSchema);

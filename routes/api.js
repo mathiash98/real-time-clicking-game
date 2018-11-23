@@ -2,11 +2,15 @@ api = require('express').Router();
 const mongoose = require('mongoose');
 const mongodb = require('mongodb');
 const multer = require('multer');
-const conf = require('../config');
+const config = require('../config');
 
 // Some stuff used to get images from gridfs
 let db;
-mongodb.MongoClient.connect(conf.mongodb.uri, function(error, client) {
+let mongodb_uri = config.mongodb.uri;
+if(process.argv[2] == '-local'){
+    mongodb_uri = config.mongodb.localUri;
+}
+mongodb.MongoClient.connect(mongodb_uri, function(error, client) {
   if (error) {
       throw error;
   }
@@ -14,7 +18,7 @@ mongodb.MongoClient.connect(conf.mongodb.uri, function(error, client) {
 });
 
 const fileStorage = require('multer-gridfs-storage') ({
-    url: conf.mongodb.uri
+    url: mongodb_uri
 });
 
 // Configure multer to pass files to fileStorage
@@ -214,15 +218,27 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
 // ==================================================================================
 // ===========================     ARMOR API STUFF      =============================
 // ==================================================================================
-api.post("/armor", isAdminJson, function(req,res) {
+api.get('/armor', function (req, res) {
+    Armor.find()
+    .sort({'level': 1}) // sort by level from 0->
+    .exec(function (err, data) {
+         if(err) {
+             console.log(err);
+             res.status(500).send(err);
+         } else {
+             res.json(data);
+         }
+    });
+ });
+
+api.post("/armor", isAdminJson, sUpload, function(req,res) {
     console.log(req.body)
-    let newArmor = new Armor();
-    newArmor.name = req.body.name;
-    newArmor.price = req.body.price;
-    newArmor.defence = req.body.defence;
-    newArmor.level = req.body.level;
+    let newArmor = new Armor(req.body);
     if(req.body.description) {
         newArmor.description = req.body.description;
+    }
+    if (req.file) {
+        newArmor._image._id = req.file.id;
     }
     newArmor.save(function (err,data) {
         if(err) {
@@ -232,6 +248,17 @@ api.post("/armor", isAdminJson, function(req,res) {
             res.json(data);
         }
     });
+});
+
+api.get('/armor/:armorid', function (req, res) {
+   Armor.findById(req.params.armorid, function (err, data) {
+        if(err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            res.json(data);
+        }
+   });
 });
 
 api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
@@ -253,7 +280,6 @@ api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
                 });
             } else {
                 req.user.money -= armor.price;
-                console.log(armor.id)
                 req.user._inventory._armors.push(armor);
                 req.user.save(function(err, data) {
                     if (err) {
@@ -341,6 +367,7 @@ api.post('/car/:carid/purchase', isLoggedInJson, function (req, res) {
      } 
     });
  });
+
 // ==================================================================================
 // ===========================     CATEGORY API STUFF    ============================
 // ==================================================================================
@@ -552,6 +579,17 @@ api.get(['/crime/:crimeid', '/crime/:crimeid/:crimename'], isLoggedInJson, funct
             res.json(crime);
         } 
     });
+});
+
+api.delete('/crime/:crimeid', isAdminJson, function (req, res) {
+   Crime.findByIdAndDelete(req.params.crimeid, function (err, data) {
+    if (err) {
+        console.log(err);
+        res.status(500).send(err);
+    } else {
+        res.json(data);
+    }
+   });
 });
 
 

@@ -1,0 +1,52 @@
+<h1>Your cars in {{user._city}}</h1>
+
+<table id="userCarList">
+    <thhead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Defence</th>
+        <th>Seats</th>
+        <th>Cargo</th>
+        <th>Speed</th>
+        <th>Level</th>
+    </thhead>
+    <tbody>
+        {{#if user._equipped.car}}
+            <tr>
+                <td><h4>Equipped:</h4></td>
+            </tr>
+            <tr>
+                <td>{{user._equipped.car.name}}</td>
+                <td>{{user._equipped.car.price}}</td>
+                <td>{{user._equipped.car.defence}}</td>
+                <td>{{user._equipped.car.seats}}</td>
+                <td>{{user._equipped.car.cargo}}</td>
+                <td>{{user._equipped.car.speed}}</td>
+                <td>{{user._equipped.car.level}}</td>
+                <td><img src="/api/image/{{user._equipped.car._image._id}}"></td>
+            </tr>
+        {{/if}}
+            <tr>
+                <td><h4>Inventory:</h4></td>
+            </tr>
+        {{#each user._inventory.cars}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.price}}</td>
+                <td>{{this.defence}}</td>
+                <td>{{this.seats}}</td>
+                <td>{{this.cargo}}</td>
+                <td>{{this.speed}}</td>
+                <td>{{this.level}}</td>
+                <td><img src="/api/image/{{this._image._id}}"></td>
+                <td><button type="button" class="btn btn-outline-secondary btn-sm" data-carid="{{this._id}}">Equip</button></td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+    document.getElementById('userCarList').addEventListener('click', function (evt) {
+        
+    });
+</script>

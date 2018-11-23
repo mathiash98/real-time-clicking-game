@@ -1,6 +1,6 @@
 module.exports = {
     mongodb: {
-        // uri: 'mongodb://localhost:27017/mafia'
+        localUri: 'mongodb://localhost:27017/mafia',
         uri: 'mongodb://admin:admin123@ds161653.mlab.com:61653/mafia'
     },
     secret: 'YOURSUPERDUPERSECRETFORPASSWORDHASHING',

@@ -6,6 +6,8 @@
                 <a href="/admin/crime" class="list-group-item list-group-item-action">Crimes</a>
                 <a href="/admin/city" class="list-group-item list-group-item-action">City</a>
                 <a href="/admin/weapon" class="list-group-item list-group-item-action">Weapon</a>
+                <a href="/admin/armor" class="list-group-item list-group-item-action">Armor</a>
+                <a href="/admin/car" class="list-group-item list-group-item-action">Cars</a>
             </div>
         </div>
         <div class="col-sm-8" id="adminPageContainer">
@@ -42,6 +44,10 @@ function checkURL() {
         request('GET', 'city', '', renderCityList);
     } else if(url.indexOf('weapon') >= 0){
         request('GET', 'weapon', '', renderWeaponList);
+    } else if(url.indexOf('armor') >= 0){
+        request('GET', 'armor', '', renderArmorList);
+    } else if(url.indexOf('car') >= 0){
+        request('GET', 'car', '', renderCarList);
     }
 }
 
@@ -78,6 +84,13 @@ function adminPageCityFormSubmit(evt, el) {
         level: el.level.value
     }
     request('POST', 'city', JSON.stringify(tmpcity), function(data){
+        console.log(JSON.parse(data.responseText));
+        checkURL();
+    });
+}
+
+function adminPageCrimeDelete(id) {
+    request('DELETE', 'crime/'+id, null, function(data) {
         console.log(data);
         checkURL();
     });
@@ -114,21 +127,50 @@ function adminPageWeaponFormSubmit(evt, el) {
     formdata.append('damage', el.damage.value);
     formdata.append('level', el.level.value);
     formdata.append('_image', el._image.files[0]);
-    {{!-- let tmpWeapon = {
-        name: el.name.value,
-        price: el.price.value,
-        damage: el.damage.value,
-        level: el.level.value
-    }; --}}
     request('POST', 'weapon', formdata, function(data){
         console.log(data);
         checkURL();
     });
 }
 
-function renderCityList(cities) {
+function adminPageArmorFormSubmit(evt, el) {
+    evt.preventDefault(); // Prevent traditional form action which reloads page
+    console.log(el);
+    let formdata = new FormData();
+    formdata.append('name', el.name.value);
+    formdata.append('price', el.price.value);
+    formdata.append('defence', el.defence.value);
+    formdata.append('level', el.level.value);
+    formdata.append('_image', el._image.files[0]);
+    request('POST', 'armor', formdata, function(data){
+        console.log(data);
+        checkURL();
+    });
+}
+
+function adminPageCarFormSubmit(evt, el) {
+    evt.preventDefault(); // Prevent traditional form action which reloads page
+    console.log(el);
+    let formdata = new FormData();
+    formdata.append('name', el.name.value);
+    formdata.append('price', el.price.value);
+    formdata.append('defence', el.defence.value);
+    formdata.append('speed', el.speed.value);
+    formdata.append('_city', el._city.value);
+    formdata.append('seats', el.seats.value);
+    formdata.append('cargo', el.cargo.value);
+    formdata.append('level', el.level.value);
+    formdata.append('_image', el._image.files[0]);
+    request('POST', 'car', formdata, function(data){
+        console.log(data);
+        checkURL();
+    });
+}
+
+function renderCityList(req) {
     /* Render the city data plus a form for adding new data 
        Considering to move stuff into a html template*/
+    let cities = JSON.parse(req.responseText);
     let tmpEl = `
             <form action="/api/city" method="post" onsubmit="adminPageCityFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
@@ -163,8 +205,9 @@ function renderCityList(cities) {
 
 
 
-function renderCrimeList(crimes) {
+function renderCrimeList(req) {
     /* Renders crime data and a form to add new crimes */
+    let crimes = JSON.parse(req.responseText);
     let tmpEl = `
             <form action="/api/crime" method="post" class="form-horizontal" onsubmit="adminPageCrimeFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
@@ -223,6 +266,7 @@ function renderCrimeList(crimes) {
                         <td>${crime.minPayout}</td>
                         <td>${crime.maxPayout}</td>
                         <td>${crime.active}</td>
+                        <td><button type="button" class="btn btn-danger" onclick="adminPageCrimeDelete('${crime._id}')">Delete</button></td>
                     </tr>`)}
                 </tbody>
             </table>
@@ -230,8 +274,9 @@ function renderCrimeList(crimes) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
-function renderPlayerList(users) {
+function renderPlayerList(req) {
     /* Render players */
+    let users = JSON.parse(req.responseText);
     let tmpEl = `
             <table class="table" id="adminPageDataTable">
                 <thead>
@@ -259,8 +304,9 @@ function renderPlayerList(users) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
-function renderWeaponList(weapons) {
+function renderWeaponList(req) {
     /* Render weapons */
+    let weapons = JSON.parse(req.responseText);
     let tmpEl = `
             <form action="/api/weapon" method="post" onsubmit="adminPageWeaponFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
@@ -285,7 +331,7 @@ function renderWeaponList(weapons) {
                     <tr>
                         <th>Name</th>
                         <th>Price</th>
-                        <th>damage</th>
+                        <th>Damage</th>
                         <th>Level</th>
                         <th>Active</th>
                     </tr>
@@ -304,6 +350,119 @@ function renderWeaponList(weapons) {
         `;
         adminPageContainer.innerHTML = tmpEl;
 }
+function renderCarList(req) {
+    /* Render cars */
+    let cars = JSON.parse(req.responseText);
+    let tmpEl = `
+            <form action="/api/car" method="post" onsubmit="adminPageCarFormSubmit(event, this)" id="adminPagePostForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="price" placeholder="Price">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="defence" placeholder="Defence">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" name="_city" placeholder="City">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="speed" placeholder="Speed">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="seats" placeholder="Seats">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="cargo" placeholder="Cargo">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="level" placeholder="Level">
+                </div>
+                <div class="form-group">
+                    <input type="file"class="form-control-file" name="_image">
+                </div>
+                <button type="submit" class="btn btn-primary">Add car</button>
+            </form>
+            <table class="table" id="adminPageDataTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Defence</th>
+                        <th>City</th>
+                        <th>Speed</th>
+                        <th>Seats</th>
+                        <th>Cargo</th>
+                        <th>Level</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${cars.map(car => `<tr>
+                        <td>${car.name}</td>
+                        <td>${car.price}</td>
+                        <td>${car.defence}</td>
+                        <td>${car._city}</td>
+                        <td>${car.speed}</td>
+                        <td>${car.seats}</td>
+                        <td>${car.cargo}</td>
+                        <td>${car.level}</td>
+                        <td>${car.active}</td>
+                        <td><img style="max-height:100px;" src="/api/image/${car._image._id}"></td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderArmorList(req) {
+    /* Render armors */
+    let data = JSON.parse(req.responseText);
+    let tmpEl = `
+            <form action="/api/armor" method="post" onsubmit="adminPageArmorFormSubmit(event, this)" id="adminPagePostForm">
+                <div class="form-group">
+                    <input type="text" class="form-control" name="name" placeholder="Name">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="price" placeholder="Price">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="defence" placeholder="Defence">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="level" placeholder="Level">
+                </div>
+                <div class="form-group">
+                    <input type="file"class="form-control-file" name="_image">
+                </div>
+                <button type="submit" class="btn btn-primary">Add armor</button>
+            </form>
+            <table class="table" id="adminPageDataTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Defence</th>
+                        <th>Level</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${data.map(armor => `<tr>
+                        <td>${armor.name}</td>
+                        <td>${armor.price}</td>
+                        <td>${armor.defence}</td>
+                        <td>${armor.level}</td>
+                        <td>${armor.active}</td>
+                        <td><img style="max-height:100px;" src="/api/image/${armor._image._id}"></td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
 
 function request(method, target, data, cb) {
     /*Sends a request to /api/:target with method, with data
@@ -312,8 +471,7 @@ function request(method, target, data, cb) {
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("readystatechange", function () {
     if (this.readyState === 4) { // readystate = complete with request
-        console.log(this.responseText);
-        cb(JSON.parse(this.responseText));
+        cb(this);
     }
     });
 

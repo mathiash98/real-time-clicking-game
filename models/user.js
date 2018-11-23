@@ -56,48 +56,13 @@ var userSchema = new mongoose.Schema({
       },
       _city: {type: String, default: "Bergen"},
       _inventory: {
-        _weapons: [{
-          name: {type: String},
-          price: {type: Number,default: 0},
-          damage: {type: Number,default: 0},
-          level: {type: Number, default: 0},
-          active: {type: Boolean, default: true},
-          _image: {
-              _id: {
-                  type:mongoose.Schema.Types.ObjectId,
-                  ref: 'fs.files'
-                }
-          }
-        }],
-        _armors: [{
-          _id: Number,
-          name:{type: String},
-          price:{type: Number, default: 0},
-          defence:{type: Number, default: 0},
-          level:{type: Number, default: 0}
-        }],
-        cars: [{
-          name: {type: String, requires: true},
-          price: {type: Number, required: true},
-          defence: {type: Number, required: true},
-          _city: {type: String, required: true},
-          speed: {type: Number, default: 60},
-          seats: {type: Number, default: 5},
-          cargo: {type: Number, default: 10},
-          level: {type: Number, default: 0},
-          active: {type: Boolean, default: true},
-          _image: {
-              _id: {
-                  type:mongoose.Schema.Types.ObjectId,
-                  ref: 'fs.files'
-                }
-          }
-        }]
+        _weapons: [{type: Object}],
+        _armors: [{type: Object}],
+        cars: [{type: Object}]
       },
-      _equipped: [{
-        type: Number,
-        ref: 'Item'
-      }],
+      _equipped: {
+        car: {type: Object}
+      },
       cooldown: {type: Map, of: mongoose.Mixed, default: new Map()},
       // cooldown: [{
       //   _id: {type: Number},

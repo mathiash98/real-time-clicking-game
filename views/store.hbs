@@ -36,7 +36,6 @@
         <th>Speed</th>
         <th>Level</th>
         <th>Image</th>
-
     </thead>
     <tbody>
         {{#each cars}}
@@ -71,6 +70,7 @@
             <td>{{this.price}}</td>
             <td>{{this.defence}}</td>
             <td>{{this.level}}</td>
+            <td><img src="/api/image/{{this._image._id}}"></td>
             <td><td><button type="button" class="btn btn-outline-secondary btn-sm" data-armorid="{{this._id}}">Buy</button></td></td>
         </tr>
         {{/each}}

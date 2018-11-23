@@ -13,10 +13,16 @@ const app = express(); // Creates an express app,
 
 const config = require('./config'); // Our config file
 
+
+let mongodb_uri = config.mongodb.uri;
+if(process.argv[2] == '-local'){
+    mongodb_uri = config.mongodb.localUri;
+}
+
 // Connect to mongodb database
-mongoose.connect(config.mongodb.uri, { useNewUrlParser: true }, function (err) {
+mongoose.connect(mongodb_uri, { useNewUrlParser: true }, function (err) {
     if(err) {throw err;}
-    console.log('Connected to mongodb at:', config.mongodb.uri);
+    console.log('Connected to mongodb at:', mongodb_uri);
 });
 
 // const server = https.createServer({}, app); // If we wan't to listen for crypted https traffic, needs certificate
