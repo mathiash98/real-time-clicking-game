@@ -24,6 +24,7 @@
       <div class="col-sm-10">
         {{{body}}}
       </div>
+      {{#if user}}
       <div class="col-sm-2">
         <h2>{{user.username}}</h2>
         <p><b>Money:</b> {{user.money}}</p>
@@ -36,6 +37,7 @@
         <p><b>Defencepoints:</b> {{user.defencePoints}}</p>
 
       </div>
+      {{/if}}
     </div>
   </body>
   

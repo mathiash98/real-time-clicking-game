@@ -194,9 +194,10 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
                 });
             } else {
                 req.user.money -= weapon.price;
-                console.log("Weapon id",weapon._id)
-                console.log("Inventory",req.user._inventory._weapons)
-                req.user._inventory._weapons.push(weapon)
+
+                // You need to make a new id for the bought item, so equipping and stuff like that actually works
+                weapon._id = mongoose.Types.ObjectId();
+                req.user._inventory._weapons.push(weapon);
                 req.user.save(function (err, data) {
                     if(err) {
                         console.log(err)
@@ -280,6 +281,8 @@ api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
                 });
             } else {
                 req.user.money -= armor.price;
+                // You need to make a new id for the bought item, so equipping and stuff like that actually works
+                armor._id = mongoose.Types.ObjectId();
                 req.user._inventory._armors.push(armor);
                 req.user.save(function(err, data) {
                     if (err) {
@@ -351,6 +354,8 @@ api.post('/car/:carid/purchase', isLoggedInJson, function (req, res) {
              });
          } else {
              req.user.money -= car.price;
+             // You need to make a new id for the bought item, so equipping and stuff like that actually works
+             car._id = mongoose.Types.ObjectId();
              req.user._inventory.cars.push(car);
              req.user.save(function (err, data) {
                 if (err) {
