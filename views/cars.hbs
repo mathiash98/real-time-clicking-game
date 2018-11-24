@@ -11,25 +11,25 @@
         <th>Level</th>
     </thhead>
     <tbody>
-        {{#if user._equipped.car}}
+        {{#if user.equipped.car}}
             <tr>
                 <td><h4>Equipped:</h4></td>
             </tr>
             <tr>
-                <td>{{user._equipped.car.name}}</td>
-                <td>{{user._equipped.car.price}}</td>
-                <td>{{user._equipped.car.defence}}</td>
-                <td>{{user._equipped.car.seats}}</td>
-                <td>{{user._equipped.car.cargo}}</td>
-                <td>{{user._equipped.car.speed}}</td>
-                <td>{{user._equipped.car.level}}</td>
-                <td><img src="/api/image/{{user._equipped.car._image._id}}"></td>
+                <td>{{user.equipped.car.name}}</td>
+                <td>{{user.equipped.car.price}}</td>
+                <td>{{user.equipped.car.defence}}</td>
+                <td>{{user.equipped.car.seats}}</td>
+                <td>{{user.equipped.car.cargo}}</td>
+                <td>{{user.equipped.car.speed}}</td>
+                <td>{{user.equipped.car.level}}</td>
+                <td><img src="/api/image/{{user.equipped.car._image._id}}"></td>
             </tr>
         {{/if}}
             <tr>
                 <td><h4>Inventory:</h4></td>
             </tr>
-        {{#each user._inventory.cars}}
+        {{#each user.inventory.cars}}
             <tr>
                 <td>{{this.name}}</td>
                 <td>{{this.price}}</td>
@@ -47,6 +47,13 @@
 
 <script>
     document.getElementById('userCarList').addEventListener('click', function (evt) {
-        
+        evt.stopPropagation();
+        let carid = evt.target.dataset.carid;
+        request('POST', '/player/'+userObject.username+'/inventory/'+'car'+'/'+carid+'/equip', null, function(res){
+            let responseData = JSON.parse(res.responseText);
+            if(responseData.success){
+                console.log(responseData);
+            }
+        });
     });
 </script>
