@@ -1,0 +1,53 @@
+<h1>Your weapons in {{user._city}}</h1>
+
+<table id="userWeaponList">
+    <thhead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Damage</th>
+        <th>Level</th>
+    </thhead>
+    <tbody>
+        {{#if user.equipped.weapon}}
+            <tr>
+                <td><h4>Equipped:</h4></td>
+            </tr>
+            <tr>
+                <td>{{user.equipped.weapon.name}}</td>
+                <td>{{user.equipped.weapon.price}}</td>
+                <td>{{user.equipped.weapon.damage}}</td>
+                <td>{{user.equipped.weapon.level}}</td>
+                <td><img src="/api/image/{{user.equipped.weapon._image._id}}"></td>
+            </tr>
+        {{/if}}
+            <tr>
+                <td><h4>Inventory:</h4></td>
+            </tr>
+        {{#each user.inventory.weapons}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.price}}</td>
+                <td>{{this.defence}}</td>
+                <td>{{this.seats}}</td>
+                <td>{{this.weapongo}}</td>
+                <td>{{this.speed}}</td>
+                <td>{{this.level}}</td>
+                <td><img src="/api/image/{{this._image._id}}"></td>
+                <td><button type="button" class="btn btn-outline-secondary btn-sm" data-weaponid="{{this._id}}">Equip</button></td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+    document.getElementById('userWeaponList').addEventListener('click', function (evt) {
+        evt.stopPropagation();
+        let weaponid = evt.target.dataset.weaponid;
+        request('POST', '/player/'+userObject.username+'/inventory/'+'weapon'+'/'+weaponid+'/equip', null, function(res){
+            let responseData = JSON.parse(res.responseText);
+            if(responseData.success){
+                console.log(responseData);
+            }
+        });
+    });
+</script>
