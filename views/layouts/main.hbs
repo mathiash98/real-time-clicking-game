@@ -7,6 +7,7 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <script>
+    {{!-- Scripts avaible for all pages --}}
     {{#if user}}
       let userObject = {{{json user}}};
     {{else}}
@@ -17,6 +18,26 @@
       document.getElementById("nav-money").innerHTML = userObject.money;
       console.log(userObject);
     };
+    function request(method, target, data, cb) {
+        /*Sends a request to /api/:target with method, with data
+          The response is then parsed and sent as argument to cb function*/
+          console.log('data in request method', data);
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === 4) { // readystate = complete with request
+            cb(this);
+        }
+        });
+
+        xhr.open(method, "/api/"+target);
+        if(data) {
+            if(data instanceof FormData){ // check if data is a formdata which is needed for file uploads
+            }else {
+                xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8"); // if not formdata, we need to specify content-type
+            }
+        }
+        xhr.send(data);
+    }
   </script>
   <body>
     {{> navbar}}
@@ -24,18 +45,20 @@
       <div class="col-sm-10">
         {{{body}}}
       </div>
-      <div class="col-sm-2">
+      {{#if user}}
+      <div class="col-sm-2 userSidebar">
         <h2>{{user.username}}</h2>
         <p><b>Money:</b> {{user.money}}</p>
         <p><b>Level:</b> {{user.level}}</p>
         <p><b>City:</b> {{user._city}}</p>
-        <p><b>Weapon:</b> {{#if user._equipped.weapon}}<img src="/api/image/{{user._equipped.wepon._image._id}}">{{/if}}</p>
+        <p><b>Weapon:</b> {{#if user.equipped.weapon}}<img src="/api/image/{{user.equipped.wepon._image._id}}">{{/if}}</p>
         <p><b>Attackpoints:</b> {{user.attackPoints}}</p>
-        <p><b>Armor:</b> {{#if user._equipped.armor}}<img src="/api/image/{{user._equipped.armor._image._id}}">{{/if}}</p>
-        <p><b>Car:</b> {{#if user._equipped.car}}<img src="/api/image/{{user._equipped.car._image._id}}">{{/if}}</p>
+        <p><b>Armor:</b> {{#if user.equipped.armor}}<img src="/api/image/{{user.equipped.armor._image._id}}">{{/if}}</p>
+        <p><b>Car:</b> {{#if user.equipped.car}}<img src="/api/image/{{user.equipped.car._image._id}}">{{/if}}</p>
         <p><b>Defencepoints:</b> {{user.defencePoints}}</p>
 
       </div>
+      {{/if}}
     </div>
   </body>
   

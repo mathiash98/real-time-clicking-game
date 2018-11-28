@@ -21,6 +21,7 @@
 
 td img {
     max-width: 100px;
+    max-height: 100px;
 }
 
 .weapandarm tr:nth-child(even) {
@@ -41,4 +42,10 @@ td img {
 }
 #crimelist .disabled {
     color: #bdbdbd;
+}
+
+/* Sidebar user info */
+.userSidebar img {
+    max-width: 200px;
+    max-height: 200px;
 }

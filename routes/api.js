@@ -96,6 +96,71 @@ api.get('/player/:username', function (req, res) {
     });
 });
 
+api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, function (req, res) {
+    let prevEquipItem = false;
+    switch (req.params.itemtype) {
+        case 'car':
+            if (req.user.equipped.car != {}) {
+                prevEquipItem = req.user.equipped.car;
+            }
+            for (let i = 0; i < req.user.inventory.cars.length; i++) { // look for the itemid in inventory
+                if (req.user.inventory.cars[i]._id == req.params.itemid){
+                    req.user.equipped.car = req.user.inventory.cars[i]; // copy item to equipped
+                    req.user.inventory.cars.splice(i, 1); // remove item from inventory
+                    console.log(req.user.inventory.cars);
+                    if(prevEquipItem){ // Add to inventory if there actually was an item there before
+                        req.user.inventory.cars.push(prevEquipItem); // move the old equipped to inventory
+                    }
+                }
+                
+            }
+            break;
+        case 'weapon':
+            if (req.user.equipped.weapon != {}) {
+                prevEquipItem = req.user.equipped.weapon;
+            }
+            for (let i = 0; i < req.user.inventory.weapons.length; i++) { // look for the itemid in inventory
+                if (req.user.inventory.weapons[i]._id == req.params.itemid){
+                    req.user.equipped.weapon = req.user.inventory.weapons[i]; // copy item to equipped
+                    req.user.inventory.weapons.splice(i, 1); // remove item from inventory
+                    if(prevEquipItem){ // Add to inventory if there actually was an item there before
+                        req.user.inventory.weapons.push(prevEquipItem); // move the old equipped to inventory
+                    }
+                }
+                
+            }
+            break;
+        case 'armor':
+            if (req.user.equipped.armor != {}) {
+                prevEquipItem = req.user.equipped.armor;
+            }
+            for (let i = 0; i < req.user.inventory.armors.length; i++) { // look for the itemid in inventory
+                if (req.user.inventory.armors[i]._id == req.params.itemid){
+                    req.user.equipped.armor = req.user.inventory.armors[i]; // copy item to equipped
+                    req.user.inventory.armors.splice(i, 1); // remove item from inventory
+                    if(prevEquipItem){ // Add to inventory if there actually was an item there before
+                        req.user.inventory.armors.push(prevEquipItem); // move the old equipped to inventory
+                    }
+                }
+                
+            }
+            break; 
+        } // switch
+
+        // Save the updated user
+        req.user.save(function (err, data) {
+            if (err) {
+                res.status(500).send(err);
+            } else {
+                res.json({
+                    success: true,
+                    msg: 'You equipped item',
+                    data: req.user.equipped
+                });
+            }
+        });
+});
+
 api.put('/player/:username', isLoggedInJson, function (req, res) {
     /* Update a player, currently only admin can change stuff */
     if (req.user.admin || req.user.username == req.params.username){
@@ -194,9 +259,10 @@ api.post("/weapon/:weaponid/purchase", isLoggedInJson, function (req,res) {
                 });
             } else {
                 req.user.money -= weapon.price;
-                console.log("Weapon id",weapon._id)
-                console.log("Inventory",req.user._inventory._weapons)
-                req.user._inventory._weapons.push(weapon)
+
+                // You need to make a new id for the bought item, so equipping and stuff like that actually works
+                weapon._id = mongoose.Types.ObjectId();
+                req.user.inventory.weapons.push(weapon);
                 req.user.save(function (err, data) {
                     if(err) {
                         console.log(err)
@@ -280,7 +346,9 @@ api.post("/armor/:armorid/purchase", isLoggedInJson, function(req,res) {
                 });
             } else {
                 req.user.money -= armor.price;
-                req.user._inventory._armors.push(armor);
+                // You need to make a new id for the bought item, so equipping and stuff like that actually works
+                armor._id = mongoose.Types.ObjectId();
+                req.user.inventory.armors.push(armor);
                 req.user.save(function(err, data) {
                     if (err) {
                         console.log(err);
@@ -351,7 +419,9 @@ api.post('/car/:carid/purchase', isLoggedInJson, function (req, res) {
              });
          } else {
              req.user.money -= car.price;
-             req.user._inventory.cars.push(car);
+             // You need to make a new id for the bought item, so equipping and stuff like that actually works
+             car._id = mongoose.Types.ObjectId();
+             req.user.inventory.cars.push(car);
              req.user.save(function (err, data) {
                 if (err) {
                     res.status(500).send(err);

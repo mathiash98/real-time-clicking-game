@@ -55,12 +55,12 @@ var userSchema = new mongoose.Schema({
         default: 100
       },
       _city: {type: String, default: "Bergen"},
-      _inventory: {
-        _weapons: [{type: Object}],
-        _armors: [{type: Object}],
-        cars: [{type: Object}]
+      inventory: {
+        weapons: [{type: Object, default: {}}],
+        armors: [{type: Object, default: {}}],
+        cars: [{type: Object, default: {}}]
       },
-      _equipped: {
+      equipped: {
         car: {type: Object}
       },
       cooldown: {type: Map, of: mongoose.Mixed, default: new Map()},

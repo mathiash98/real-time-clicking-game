@@ -43,7 +43,7 @@ var storageSchema = new mongoose.Schema({
     //     _image: [objectid, ref: gridfs.images]
     // },
     _cars: [], // {type: mongoose.Schema.Types.ObjectId, ref: 'Car'}
-    _weapons: [], // {type: mongoose.Schema.Types.ObjectId, ref: 'Weapon'}
+    weapons: [], // {type: mongoose.Schema.Types.ObjectId, ref: 'Weapon'}
     _protections: [], // {type: mongoose.Schema.Types.ObjectId, ref: 'HouseDefence'} <- list of security items on this item
     standardDefencePoints: Number,
     defencePoints: Number, // Number of defence points including _protections items

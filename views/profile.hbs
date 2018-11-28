@@ -6,12 +6,12 @@
             <li>Level: {{user.level}}</li>
             <li>HP: {{user.hp}}</li>
             <li>Weapons:    
-                {{#each user._inventory._weapons}}
+                {{#each user.inventory.weapons}}
                     {{this.name}}
                 {{/each}}
             </li>
             <li>Armors:    
-                {{#each user._inventory._armors}}
+                {{#each user.inventory.armors}}
                     {{this.name}}
                 {{/each}}
             </li>
