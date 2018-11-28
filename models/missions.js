@@ -21,20 +21,20 @@ var missionsSchema = new mongoose.Schema({
     name: {type: String, required: true},
     rewardxp: {type: Number, required: true},
     rewardPayout: {type: Number, required: true},
-    reqLevel: {type: Number, required: true},
-    requirements: [
-        {
-            fieldname: '_inventory.cars',
-            operator: 'contains',
-            checkFieldname: 'name',
-            val: 'Tesla Model S'
-        }, {
-            fieldname: '_inventory.weapons',
-            operator: 'length',
-            val: 10
-        }
+    reqLevel: {type: Number, required: true}
+    // requirements: [
+    //     {
+    //         fieldname: '_inventory.cars',
+    //         operator: 'contains',
+    //         checkFieldname: 'name',
+    //         val: 'Tesla Model S'
+    //     }, {
+    //         fieldname: '_inventory.weapons',
+    //         operator: 'length',
+    //         val: 10
+    //     }
         
-    ]
+    // ]
 
     /**
      * for (requirement in mission.requirements){
