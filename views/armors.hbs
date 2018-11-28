@@ -1,0 +1,53 @@
+<h1>Your armors in {{user._city}}</h1>
+
+<table id="userArmorList">
+    <thhead>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Defence</th>
+        <th>Level</th>
+    </thhead>
+    <tbody>
+        {{#if user.equipped.armor}}
+            <tr>
+                <td><h4>Equipped:</h4></td>
+            </tr>
+            <tr>
+                <td>{{user.equipped.armor.name}}</td>
+                <td>{{user.equipped.armor.price}}</td>
+                <td>{{user.equipped.armor.defence}}</td>
+                <td>{{user.equipped.armor.level}}</td>
+                <td><img src="/api/image/{{user.equipped.armor._image._id}}"></td>
+            </tr>
+        {{/if}}
+            <tr>
+                <td><h4>Inventory:</h4></td>
+            </tr>
+        {{#each user.inventory.armors}}
+            <tr>
+                <td>{{this.name}}</td>
+                <td>{{this.price}}</td>
+                <td>{{this.defence}}</td>
+                <td>{{this.seats}}</td>
+                <td>{{this.armorgo}}</td>
+                <td>{{this.speed}}</td>
+                <td>{{this.level}}</td>
+                <td><img src="/api/image/{{this._image._id}}"></td>
+                <td><button type="button" class="btn btn-outline-secondary btn-sm" data-armorid="{{this._id}}">Equip</button></td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+    document.getElementById('userArmorList').addEventListener('click', function (evt) {
+        evt.stopPropagation();
+        let armorid = evt.target.dataset.armorid;
+        request('POST', '/player/'+userObject.username+'/inventory/'+'armor'+'/'+armorid+'/equip', null, function(res){
+            let responseData = JSON.parse(res.responseText);
+            if(responseData.success){
+                console.log(responseData);
+            }
+        });
+    });
+</script>

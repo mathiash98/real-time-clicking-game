@@ -100,7 +100,7 @@ api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, 
     let prevEquipItem = false;
     switch (req.params.itemtype) {
         case 'car':
-            if (req.user.equipped.car != {}) {
+            if (req.user.equipped.car !== 'undefined') {
                 prevEquipItem = req.user.equipped.car;
             }
             for (let i = 0; i < req.user.inventory.cars.length; i++) { // look for the itemid in inventory
@@ -116,7 +116,7 @@ api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, 
             }
             break;
         case 'weapon':
-            if (req.user.equipped.weapon != {}) {
+            if (req.user.equipped.weapon !== 'undefined') {
                 prevEquipItem = req.user.equipped.weapon;
             }
             for (let i = 0; i < req.user.inventory.weapons.length; i++) { // look for the itemid in inventory
@@ -131,7 +131,7 @@ api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, 
             }
             break;
         case 'armor':
-            if (req.user.equipped.armor != {}) {
+            if (req.user.equipped.armor !== 'undefined') {
                 prevEquipItem = req.user.equipped.armor;
             }
             for (let i = 0; i < req.user.inventory.armors.length; i++) { // look for the itemid in inventory

@@ -61,7 +61,9 @@ var userSchema = new mongoose.Schema({
         cars: [{type: Object, default: {}}]
       },
       equipped: {
-        car: {type: Object}
+        car: {type: Object},
+        armor: {type: Object},
+        weapon: {type: Object}
       },
       cooldown: {type: Map, of: mongoose.Mixed, default: new Map()},
       // cooldown: [{
