@@ -1,0 +1,47 @@
+<div class="list-group" id="missionlist">
+    {{#each missions}}
+        <button type="button" class="list-group-item list-group-item-action" data-missionid="{{this._id}}">{{this.name}} - required level: {{this.level}}</button>
+    {{/each}}
+</div>
+
+<span id="missionResponseBox" style="color:white;"></span>
+
+
+<script>
+let missionlistButtons = document.getElementById('missionlist').children;
+let missionResponseBox = document.getElementById('missionResponseBox');
+
+document.getElementById('missionlist').addEventListener('click', function(e){
+    /* Listens for click on missionlist element */ 
+    handleCrimelistClick(e);
+});
+
+function handleCrimelistClick(e) {
+    e.stopPropagation(); // used to reduce cpu usage
+    let missionid = e.target.dataset.missionid;
+
+    var xhr = new XMLHttpRequest();
+
+    // When xhr has been sent, this wil listen for changes in readystate
+    // readystate 4 = request is complete
+    xhr.addEventListener("readystatechange", function () { 
+    if (this.readyState === 4) {
+        let res  = JSON.parse(this.responseText); // parse the incoming message
+        
+        if(res.success){ // mission succeded
+            missionResponseBox.style.backgroundColor = 'green';
+            // update user info in navbar
+            userObject.money += res.reward;
+            missionResponseBox.innerHTML = res.msg + ' +' + res.reward + ' money and +' + res.experience + ' xp.'; // Display the msg in the missionResponseBox element
+            updateUserNavbar();
+        } else {
+            missionResponseBox.innerHTML = res.msg; // Display the msg in the missionResponseBox element
+            missionResponseBox.style.backgroundColor = 'red';
+        }
+    }
+    });
+
+    xhr.open("POST", "/api/mission/"+missionid+"/perform"); // Define method (GET, POST etc), to what API endpoint
+    xhr.send(); // send xhr request
+}
+</script>   

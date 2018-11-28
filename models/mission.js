@@ -1,4 +1,4 @@
-console.log("Hello from missions.js")
+console.log("Hello from mission.js")
 const mongoose = require("mongoose")
 
 /*Make missions, where player has to obtain a certain amount of objects by travelling to 
@@ -17,24 +17,20 @@ Ha en dict av funksjoner, som blir lagd tilpasset hvert mission.
 
 */
 
-var missionsSchema = new mongoose.Schema({
+var missionSchema = new mongoose.Schema({
     name: {type: String, required: true},
+    city: {type: String, required: true},
     rewardxp: {type: Number, required: true},
     rewardPayout: {type: Number, required: true},
-    reqLevel: {type: Number, required: true}
-    // requirements: [
-    //     {
-    //         fieldname: '_inventory.cars',
-    //         operator: 'contains',
-    //         checkFieldname: 'name',
-    //         val: 'Tesla Model S'
-    //     }, {
-    //         fieldname: '_inventory.weapons',
-    //         operator: 'length',
-    //         val: 10
-    //     }
-        
-    // ]
+    level: {type: Number, required: true},
+    requirements: [
+        {
+            objectKey: {type: String, required: true}, // example inventory.cars or equipped.cars, if using eq as operator, this is not used
+            operator: {type: String, required: true}, // has, eq, gt, lt
+            checkFieldname: {type: String, required: true}, // what fieldname inside objectKey to check example name
+            val: {type: String, required: true}, // what value to compare with example 'Tesla Model S'
+        }
+    ]
 
     /**
      * for (requirement in mission.requirements){
@@ -80,8 +76,8 @@ var missionsSchema = new mongoose.Schema({
     */ 
 });
 
-missionsSchema.pre("save",function(next) {
+missionSchema.pre("save",function(next) {
     this.edited = new Date();
     return next();
 });
-module.exports = mongoose.model("Missions",missionsSchema);
+module.exports = mongoose.model("Mission", missionSchema);

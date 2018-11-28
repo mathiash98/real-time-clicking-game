@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const mongodb = require('mongodb');
 const multer = require('multer');
 const config = require('../config');
+const async = require('async');
 
 // Some stuff used to get images from gridfs
 let db;
@@ -34,7 +35,7 @@ const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
 const Car = require('../models/car');
-const Missions = require("../models/missions");
+const Mission = require("../models/mission");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -100,9 +101,11 @@ api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, 
     switch (req.params.itemtype) {
         case 'car':
             if (req.user.equipped.car !== 'undefined') {
+                console.log('There is something in equipped already');
                 prevEquipItem = req.user.equipped.car;
             }
             for (let i = 0; i < req.user.inventory.cars.length; i++) { // look for the itemid in inventory
+                console.log('CHecking car:', req.user.inventory.cars[i].name);
                 if (req.user.inventory.cars[i]._id == req.params.itemid){
                     req.user.equipped.car = req.user.inventory.cars[i]; // copy item to equipped
                     req.user.inventory.cars.splice(i, 1); // remove item from inventory
@@ -149,6 +152,7 @@ api.post('/player/:username/inventory/:itemtype/:itemid/equip', isLoggedInJson, 
         // Save the updated user
         req.user.save(function (err, data) {
             if (err) {
+                console.log('Got error');
                 res.status(500).send(err);
             } else {
                 res.json({
@@ -753,34 +757,107 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
     });
 });
 // ===========================  ==========================   ============================
-// ===========================  Missions  API    =============================
+// ===========================      Mission  API             ============================
 // ===========================  ==========================   ============================
-api.post("/missions", isAdminJson, function (req, res) {
-    let newMissions = new missions(req.body);
+api.post("/mission", isAdminJson, function (req, res) {
+    let newMission = new Mission(req.body);
 
-    newMissions.save(function(err,missions) {
+    newMission.save(function(err, mission) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            console.log("New organized crime added.",missions.name);
-            res.json(missions);
+            console.log("New mission added.",mission.name);
+            res.json(mission);
         }
     })
 
 });
 
-api.post("/missions/:missionsid/perform", isLoggedInJson, function(req, res) {
-    Missions.findOne({"_id": req.params.missionsid, "_city": req.user._city})
-    .exec(function (err, missions) {
+api.get('/mission', function (req, res) {
+   Mission.find()
+   .sort({'level': 1})
+   .exec(function (err, data) {
+        if (err) {
+            console.log(err);
+            res.status(500).send(err);
+        } else {
+            res.json(data);
+        }
+   });
+});
+
+api.post("/mission/:missionid/perform", isLoggedInJson, function(req, res) {
+    Mission.findById(req.params.missionid)
+    .lean()
+    .exec(function (err, mission) {
         if (err) {
             console.log(err)
             res.status(500).send(err);
         } else {
-            //Add crime logic
+            async.each(mission.requirements, function (requirement, cb) {
+                if (requirement.operator == 'eq') {
+                    let requirementKeys = requirement.checkFieldname.split('.');
+                    let currentValue = req.user[requirementKeys[0]];
+                    for (var i = 1; i < requirementKeys.length; i++) {
+                        currentValue = currentValue[requirementKeys[i]];
+                    }
+                    if(currentValue == requirement.val){
+                        cb(null);
+                    } else{
+                        cb('You need ' + requirement.val + ' on ' + requirement.checkFieldname);
+                    }
+                } else if (requirement.operator == 'contains') {
+                    let requirementKeys = requirement.objectKey.split('.');
+                    let arr = req.user[requirementKeys[0]];
+                    for (var i = 1; i < requirementKeys.length; i++) {
+                        arr = arr[requirementKeys[i]];
+                    }
+                    for (var i = 0; i < arr.length; i++) {
+                        if(arr[i][requirement.checkFieldname] == requirement.val){
+                            cb(null);
+                        }
+                    }
+                    cb(requirement.objectKey + ' does not contain ' + requirement.val);
+                } else if (requirement.operator == 'gt') {
+                    let requirementKeys = requirement.checkFieldname.split('.');
+                    let currentValue = req.user[requirementKeys[0]];
+                    for (var i = 1; i < requirementKeys.length; i++) {
+                        currentValue = currentValue[requirementKeys[i]];
+                    }
+                    if(currentValue > requirement.val){
+                        cb(null);
+                    } else{
+                        cb('You need ' + requirement.checkFieldname + ' to be greater than ' + requirement.val);
+                    }
+                }
+            }, function (err, data) {
+               if(err){
+                   res.json({
+                       success: false,
+                       msg: err
+                   });
+               } else {
+                   req.user.money += mission.rewardPayout;
+                   req.user.xp += mission.rewardxp;
+                   req.user.save(function (err, data) {
+                       if (err) {
+                           res.status(500).send(err);
+                       } else {
+                           res.json({
+                               success: true,
+                               msg: 'Mission is complete',
+                               reward: mission.rewardPayout,
+                               experience: mission.rewardxp
+                           });
+                       }
+                   }); // req.user.save
+               } // else
+            }); // async
+            
         }
-    })
-})
+    }); // find
+});
 
 
 // ==================================================================================

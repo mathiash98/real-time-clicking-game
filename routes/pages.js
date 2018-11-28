@@ -7,6 +7,7 @@ const City = require('../models/city');
 const User = require("../models/user");
 const Armor = require("../models/armor");
 const Car = require("../models/car");
+const Mission = require("../models/mission");
 // const OrganizedCrime = require("../models/organizedcrime");
 // route middleware to ensure user is logged in
 function isLoggedIn(req, res, next) {
@@ -41,15 +42,15 @@ app.get('/crime', isLoggedIn, function (req, res) {
     });
 });
 
-app.get("/missions",isLoggedIn, function (req, res) {
-    Missions.find({"_city":req.user._city})
-    .sort({"difficulty": 1})
-    .exec(function (err, missions) {
-        res.render("missions", {"missions": Missions});
+app.get("/mission", isLoggedIn, function (req, res) {
+    Mission.find({"_city": req.user._city})
+    .sort({"level": 1})
+    .exec(function (err, data) {
+        res.render("mission", {"missions": data});
     });
 });
 
-app.get("/store",isLoggedIn, function (req, res) {
+app.get("/store", isLoggedIn, function (req, res) {
     Weapon.find(function (err, weapons) {
         Armor.find(function (err, armors) {
             Car.find(function (err, cars) {
@@ -59,7 +60,7 @@ app.get("/store",isLoggedIn, function (req, res) {
     }); 
 });
 
-app.get("/profile",isLoggedIn, function (req, res ) {
+app.get("/profile", isLoggedIn, function (req, res ) {
     User.find(function (err,users) {
         res.render("profile", {"users": users});
     }); 
