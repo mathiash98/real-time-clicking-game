@@ -3,9 +3,6 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcryptjs');
 var SALT_WORK_FACTOR = 10;
 
-// Dependent models
-const Item = require('./item');
-const City = require('./city');
 
 var userSchema = new mongoose.Schema({
       username: {

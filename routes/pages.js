@@ -41,11 +41,11 @@ app.get('/crime', isLoggedIn, function (req, res) {
     });
 });
 
-app.get("/organizedcrime",isLoggedIn, function (req, res) {
-    OrganizedCrime.find({"_city":req.user._city})
+app.get("/missions",isLoggedIn, function (req, res) {
+    Missions.find({"_city":req.user._city})
     .sort({"difficulty": 1})
-    .exec(function (err, organizedcrimes) {
-        res.render("organizedcrime", {"OrganizedCrimes": organizedcrimes});
+    .exec(function (err, missions) {
+        res.render("missions", {"missions": Missions});
     });
 });
 
@@ -63,6 +63,12 @@ app.get("/profile",isLoggedIn, function (req, res ) {
     User.find(function (err,users) {
         res.render("profile", {"users": users});
     }); 
+});
+
+app.get("/bank", isLoggedIn, function (req, res) {
+    User.find(function(err, users) {
+        res.render("bank", {"users": users})
+    });
 });
 
 app.get('/city', isLoggedIn, function (req, res) {

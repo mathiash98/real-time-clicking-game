@@ -1,4 +1,4 @@
-console.log('Hello from item.js');
+console.log('Hello from city.js');
 const mongoose = require('mongoose');
 const autoinc = require('mongoose-plugin-autoinc').autoIncrement;
 

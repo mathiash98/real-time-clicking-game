@@ -29,7 +29,6 @@ const sUpload = upload.single('_image');
 
 // Models
 var User = require('../models/user');
-const Category = require('../models/category');
 const City = require('../models/city');
 const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
@@ -437,39 +436,6 @@ api.post('/car/:carid/purchase', isLoggedInJson, function (req, res) {
      } 
     });
  });
-
-// ==================================================================================
-// ===========================     CATEGORY API STUFF    ============================
-// ==================================================================================
-api.get('/category', function (req, res) {
-    Category.find()
-    .exec(function (err, data) {
-       if (err) {
-           res.status(500).send(err);
-       } else {
-           res.json(data)
-       }
-    });
-});
-
-api.post('/category', isAdminJson, function (req, res) {
-    console.log('got request');
-    var newCategory = new Category();
-    if(req.body.name){
-        newCategory.name = req.body.name;
-        
-        newCategory.save(function (err, data) {
-            if (err) {
-                console.log(err);
-                res.status(500).send(err);
-            } else {
-                res.json(data)
-            } 
-        });
-    } else {
-        res.status(400).send('You need a name for the category');
-    }
-});
 
 // ==================================================================================
 // ===========================     City API STUFF    ================================
