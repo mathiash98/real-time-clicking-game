@@ -35,7 +35,7 @@ const Crime = require('../models/crime');
 const Weapon = require("../models/weapon");
 const Armor = require("../models/armor");
 const Car = require('../models/car');
-// const OrganizedCrime = require("../models/organizedcrime");
+const Missions = require("../models/missions");
 
 function isLoggedInJson(req, res, next) {
     /* Expreess middleware, you can use to check if user is logged in, see below for examples */
@@ -717,26 +717,26 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
     });
 });
 // ===========================  ==========================   ============================
-// ===========================  Organized Crime API STUFF   =============================
+// ===========================  Missions  API    =============================
 // ===========================  ==========================   ============================
-api.post("/organizedcrime", isAdminJson, function (req, res) {
-    let newOrganizedCrime = new OrganizedCrime(req.body);
+api.post("/missions", isAdminJson, function (req, res) {
+    let newMissions = new missions(req.body);
 
-    newOrganizedCrime.save(function(err,organizedcrime) {
+    newMissions.save(function(err,missions) {
         if (err) {
             console.log(err);
             res.status(500).send(err);
         } else {
-            console.log("New organized crime added.",organizedcrime.name);
-            res.json(organizedcrime);
+            console.log("New organized crime added.",missions.name);
+            res.json(missions);
         }
     })
 
 });
 
-api.post("/organizedcrime/:organizedcrimeid/perform", isLoggedInJson, function(req, res) {
-    OrganizedCrime.findOne({"_id": req.params.organizedcrimeid, "_city": req.user._city})
-    .exec(function (err, organizedcrime) {
+api.post("/missions/:missionsid/perform", isLoggedInJson, function(req, res) {
+    Missions.findOne({"_id": req.params.missionsid, "_city": req.user._city})
+    .exec(function (err, missions) {
         if (err) {
             console.log(err)
             res.status(500).send(err);

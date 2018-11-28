@@ -69,6 +69,9 @@ var userSchema = new mongoose.Schema({
       //   started: {type: Date},
       //   end: {type: Date}
       // }],
+      missionList: {
+        list: []
+      },
       active: {type: Boolean, default: true},
       added: { type: Date, default: Date.now },
       edited: { type: Date, default: Date.now }
