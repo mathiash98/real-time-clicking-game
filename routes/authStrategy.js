@@ -84,5 +84,5 @@ module.exports = function (passport) {
         });
     }));
 
-    return passport
+    return passport;
 }

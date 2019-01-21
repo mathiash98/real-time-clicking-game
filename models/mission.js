@@ -19,7 +19,7 @@ Ha en dict av funksjoner, som blir lagd tilpasset hvert mission.
 
 var missionSchema = new mongoose.Schema({
     name: {type: String, required: true},
-    city: {type: String, required: true},
+    _city: {type: String, required: true},
     rewardxp: {type: Number, required: true},
     rewardPayout: {type: Number, required: true},
     level: {type: Number, required: true},

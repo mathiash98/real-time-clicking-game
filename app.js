@@ -13,7 +13,6 @@ const app = express(); // Creates an express app,
 
 const config = require('./config'); // Our config file
 
-
 let mongodb_uri = config.mongodb.uri;
 if(process.argv[2] == '-local'){
     mongodb_uri = config.mongodb.localUri;

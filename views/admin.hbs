@@ -8,6 +8,7 @@
                 <a href="/admin/weapon" class="list-group-item list-group-item-action">Weapon</a>
                 <a href="/admin/armor" class="list-group-item list-group-item-action">Armor</a>
                 <a href="/admin/car" class="list-group-item list-group-item-action">Cars</a>
+                <a href="/admin/mission" class="list-group-item list-group-item-action">Missions</a>
             </div>
         </div>
         <div class="col-sm-8" id="adminPageContainer">
@@ -48,6 +49,8 @@ function checkURL() {
         request('GET', 'armor', '', renderArmorList);
     } else if(url.indexOf('car') >= 0){
         request('GET', 'car', '', renderCarList);
+    } else if(url.indexOf('mission') >= 0){
+        request('GET', 'mission', '', renderMissionList);
     }
 }
 
@@ -304,46 +307,78 @@ function renderPlayerList(req) {
         adminPageContainer.innerHTML = tmpEl;
 }
 
-function renderWeaponList(req) {
+function renderMissionList(req) {
+    /* Render players */
+    let users = JSON.parse(req.responseText);
+    let tmpEl = `
+            <table class="table" id="adminPageDataTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Level</th>
+                        <th>City</th>
+                        <th>Admin</th>
+                        <th>Money</th>
+                        <th>HP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${users.map(player => `<tr>
+                        <td>${player.username}</td>
+                        <td>${player.level}</td>
+                        <td>${player._city}</td>
+                        <td>${player.admin}</td>
+                        <td>${player.money}</td>
+                        <td>${player.hp}</td>
+                    </tr>`)}
+                </tbody>
+            </table>
+        `;
+        adminPageContainer.innerHTML = tmpEl;
+}
+
+function renderMissionList(req) {
     /* Render weapons */
-    let weapons = JSON.parse(req.responseText);
+    let missions = JSON.parse(req.responseText);
     let tmpEl = `
             <form action="/api/weapon" method="post" onsubmit="adminPageWeaponFormSubmit(event, this)" id="adminPagePostForm">
                 <div class="form-group">
                     <input type="text" class="form-control" name="name" placeholder="Name">
                 </div>
                 <div class="form-group">
-                    <input type="number" class="form-control" name="price" placeholder="Price">
+                    <input type="text" class="form-control" name="_city" placeholder="City">
                 </div>
                 <div class="form-group">
-                    <input type="number" class="form-control" name="damage" placeholder="Damage">
+                    <input type="number" class="form-control" name="rewardxp" placeholder="Reward XP">
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" name="rewardPayout" placeholder="Reward money">
                 </div>
                 <div class="form-group">
                     <input type="number" class="form-control" name="level" placeholder="Level">
                 </div>
-                <div class="form-group">
-                    <input type="file"class="form-control-file" name="_image">
-                </div>
-                <button type="submit" class="btn btn-primary">Add weapon</button>
+                
+                <button type="submit" class="btn btn-primary">Add mission</button>
             </form>
             <table class="table" id="adminPageDataTable">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Price</th>
-                        <th>Damage</th>
+                        <th>City</th>
+                        <th>XP</th>
+                        <th>Payout</th>
                         <th>Level</th>
-                        <th>Active</th>
+                        <th>n requirements</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${weapons.map(weapon => `<tr>
-                        <td>${weapon.name}</td>
-                        <td>${weapon.price}</td>
-                        <td>${weapon.damage}</td>
-                        <td>${weapon.level}</td>
-                        <td>${weapon.active}</td>
-                        <td><img style="max-height:100px;" src="/api/image/${weapon._image._id}"></td>
+                    ${missions.map(mission => `<tr>
+                        <td>${mission.name}</td>
+                        <td>${mission._city}</td>
+                        <td>${mission.rewardxp}</td>
+                        <td>${mission.rewardPayout}</td>
+                        <td>${mission.level}</td>
+                        <td>${mission.requirements.length}</td>
                     </tr>`)}
                 </tbody>
             </table>

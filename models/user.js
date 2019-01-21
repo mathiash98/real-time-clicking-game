@@ -68,18 +68,21 @@ var userSchema = new mongoose.Schema({
       //   started: {type: Date},
       //   end: {type: Date}
       // }],
-      missionList: {
-        list: []
-      },
+      performedMissions: [{type: Object}],
       active: {type: Boolean, default: true},
-      added: { type: Date, default: Date.now },
-      edited: { type: Date, default: Date.now }
+      added: {type: Date, default: Date.now},
+      edited: {type: Date, default: Date.now}
     });
 
 userSchema.pre('save', function(next) {
   var user = this;
   if(this.isNew){
   }
+  if(user.xp > user.xp_to_level) {
+        user.xp -= user.xp_to_level;
+        user.xp_to_level += user.xp_to_level;
+        user.level += 1;
+    }
     user.edited = new Date();
     if (user.isModified('local_login.password') || user.isNew && typeof user.local_login.password != 'undefined') {
       bcrypt.hash(user.local_login.password, SALT_WORK_FACTOR, function (err, hash) {

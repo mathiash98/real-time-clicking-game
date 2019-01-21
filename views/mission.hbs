@@ -32,6 +32,7 @@ function handleCrimelistClick(e) {
             missionResponseBox.style.backgroundColor = 'green';
             // update user info in navbar
             userObject.money += res.reward;
+            userObject.xp += res.xperience;
             missionResponseBox.innerHTML = res.msg + ' +' + res.reward + ' money and +' + res.experience + ' xp.'; // Display the msg in the missionResponseBox element
             updateUserNavbar();
         } else {

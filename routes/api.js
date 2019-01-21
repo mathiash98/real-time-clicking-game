@@ -1,4 +1,4 @@
-api = require('express').Router();
+const api = require('express').Router();
 const mongoose = require('mongoose');
 const mongodb = require('mongodb');
 const multer = require('multer');
@@ -712,11 +712,6 @@ api.post('/crime/:crimeid/perform', isLoggedInJson, function (req, res) {
                         req.user.money += payout;
                         //Add experience to the player, based on crime.experience
                         req.user.xp += crime.experience;
-                        if(req.user.xp == req.user.xp_to_level) {
-                            req.user.xp = 0;
-                            req.user.xp_to_level += req.user.xp_to_level;
-                            req.user.level += 1;
-                        }
                         
                         // find a random message based on msgSuccess array
                         let tmpMsg = crime.msgSuccess[getRandomInt(0, crime.msgSuccess.length-1)];
@@ -788,75 +783,95 @@ api.get('/mission', function (req, res) {
 });
 
 api.post("/mission/:missionid/perform", isLoggedInJson, function(req, res) {
-    Mission.findById(req.params.missionid)
-    .lean()
-    .exec(function (err, mission) {
-        if (err) {
-            console.log(err)
-            res.status(500).send(err);
-        } else {
-            async.each(mission.requirements, function (requirement, cb) {
-                if (requirement.operator == 'eq') {
-                    let requirementKeys = requirement.checkFieldname.split('.');
-                    let currentValue = req.user[requirementKeys[0]];
-                    for (var i = 1; i < requirementKeys.length; i++) {
-                        currentValue = currentValue[requirementKeys[i]];
-                    }
-                    if(currentValue == requirement.val){
-                        cb(null);
-                    } else{
-                        cb('You need ' + requirement.val + ' on ' + requirement.checkFieldname);
-                    }
-                } else if (requirement.operator == 'contains') {
-                    let requirementKeys = requirement.objectKey.split('.');
-                    let arr = req.user[requirementKeys[0]];
-                    for (var i = 1; i < requirementKeys.length; i++) {
-                        arr = arr[requirementKeys[i]];
-                    }
-                    for (var i = 0; i < arr.length; i++) {
-                        if(arr[i][requirement.checkFieldname] == requirement.val){
+    function checkMissionComplete() {
+        for (var i = 0; i < req.user.performedMissions.length; i++) {
+            if(req.user.performedMissions[i]._id == req.params.missionid) {
+                return true;
+            }
+        }
+        return false
+    }
+    if (checkMissionComplete()){
+        res.json({
+            success: false,
+            msg: 'You have done that mission before.'
+        });
+    } else {
+        Mission.findById(req.params.missionid)
+        .lean()
+        .exec(function (err, mission) {
+            if (err) {
+                console.log(err)
+                res.status(500).send(err);
+            } else {
+                async.each(mission.requirements, function (requirement, cb) {
+                    if (requirement.operator == 'eq') {
+                        let requirementKeys = requirement.checkFieldname.split('.');
+                        let currentValue = req.user[requirementKeys[0]];
+                        for (var i = 1; i < requirementKeys.length; i++) {
+                            currentValue = currentValue[requirementKeys[i]];
+                        }
+                        if(currentValue == requirement.val){
                             cb(null);
+                        } else{
+                            cb('You need ' + requirement.val + ' on ' + requirement.checkFieldname);
+                        }
+                    } else if (requirement.operator == 'contains') {
+                        let requirementKeys = requirement.objectKey.split('.');
+                        let arr = req.user[requirementKeys[0]];
+                        for (var i = 1; i < requirementKeys.length; i++) {
+                            arr = arr[requirementKeys[i]];
+                        }
+                        for (var i = 0; i < arr.length; i++) {
+                            if(arr[i][requirement.checkFieldname] == requirement.val){
+                                cb(null);
+                            }
+                        }
+                        cb(requirement.objectKey + ' does not contain ' + requirement.val);
+                    } else if (requirement.operator == 'gt') {
+                        let requirementKeys = requirement.checkFieldname.split('.');
+                        let currentValue = req.user[requirementKeys[0]];
+                        for (var i = 1; i < requirementKeys.length; i++) {
+                            currentValue = currentValue[requirementKeys[i]];
+                        }
+                        if(currentValue > requirement.val){
+                            cb(null);
+                        } else{
+                            cb('You need ' + requirement.checkFieldname + ' to be greater than ' + requirement.val);
                         }
                     }
-                    cb(requirement.objectKey + ' does not contain ' + requirement.val);
-                } else if (requirement.operator == 'gt') {
-                    let requirementKeys = requirement.checkFieldname.split('.');
-                    let currentValue = req.user[requirementKeys[0]];
-                    for (var i = 1; i < requirementKeys.length; i++) {
-                        currentValue = currentValue[requirementKeys[i]];
-                    }
-                    if(currentValue > requirement.val){
-                        cb(null);
-                    } else{
-                        cb('You need ' + requirement.checkFieldname + ' to be greater than ' + requirement.val);
-                    }
-                }
-            }, function (err, data) {
-               if(err){
-                   res.json({
-                       success: false,
-                       msg: err
-                   });
-               } else {
-                   req.user.money += mission.rewardPayout;
-                   req.user.xp += mission.rewardxp;
-                   req.user.save(function (err, data) {
-                       if (err) {
-                           res.status(500).send(err);
-                       } else {
-                           res.json({
-                               success: true,
-                               msg: 'Mission is complete',
-                               reward: mission.rewardPayout,
-                               experience: mission.rewardxp
-                           });
-                       }
-                   }); // req.user.save
-               } // else
-            }); // async
-            
-        }
-    }); // find
+                }, function (err, data) {
+                   if(err){
+                       res.json({
+                           success: false,
+                           msg: err
+                       });
+                   } else {
+                       req.user.performedMissions.push({
+                           _id: mission._id,
+                           performed: Date.now()
+                       });
+                       req.user.money += mission.rewardPayout;
+                       req.user.xp += mission.rewardxp;
+                       req.user.save(function (err, data) {
+                           if (err) {
+                               res.status(500).send(err);
+                           } else {
+                               res.json({
+                                   success: true,
+                                   msg: 'Mission is complete',
+                                   reward: mission.rewardPayout,
+                                   experience: mission.rewardxp
+                               });
+                           }
+                       }); // req.user.save
+                   } // else
+                }); // async
+                
+            }
+        }); // find
+
+    } // else check
 });
 
 
